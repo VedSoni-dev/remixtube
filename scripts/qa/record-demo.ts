@@ -44,34 +44,32 @@ const page = await ctxA.newPage();
 const t0 = Date.now();
 await page.goto(base + "/", { waitUntil: "networkidle" });
 await page.mouse.move(640, 300);
-await page.waitForTimeout(2200);
+await page.waitForTimeout(1600);
 await page.evaluate(() => document.querySelector("#build")?.scrollIntoView({ behavior: "smooth" }));
-await page.waitForTimeout(1300);
+await page.waitForTimeout(900);
 const marks: Record<string, number> = { interests: (Date.now() - t0) / 1000 };
 for (const name of ["Machine learning & deep learning", "Functional programming", "Fundamental physics"]) {
-  await glide(page, `#build button:has-text("${name}")`, { pause: 1800 });
+  await glide(page, `#build button:has-text("${name}")`, { pause: 1350 });
 }
-await page.evaluate(() => window.scrollBy({ top: -200, behavior: "smooth" }));
-await page.waitForTimeout(500);
-await glide(page, `#build button:has-text("Make my Tube")`, { pause: 300 });
+await glide(page, `#build button:has-text("Make my Tube")`, { pause: 200 });
 await page.locator("[data-card]").first().waitFor();
 marks.feed = (Date.now() - t0) / 1000;
-await page.waitForTimeout(1800);
-await glide(page, "[data-card] button", { pause: 2600 });
+await page.waitForTimeout(1300);
+await glide(page, "[data-card] button", { pause: 1800 });
 await page.getByRole("heading", { name: "Recommended by the HN community" }).waitFor();
 const dialog = page.getByRole("dialog");
-for (let i = 0; i < 6; i++) { await dialog.evaluate((d) => d.scrollBy({ top: 170, behavior: "smooth" })); await page.waitForTimeout(420); }
-await page.waitForTimeout(1200);
+for (let i = 0; i < 5; i++) { await dialog.evaluate((d) => d.scrollBy({ top: 190, behavior: "smooth" })); await page.waitForTimeout(330); }
+await page.waitForTimeout(900);
 marks.provenance = (Date.now() - t0) / 1000;
 await page.keyboard.press("Escape");
-await page.waitForTimeout(500);
-await glide(page, "button:has-text('Share & export')", { pause: 900 });
+await page.waitForTimeout(300);
+await glide(page, "button:has-text('Share & export')", { pause: 700 });
 const nameBox = page.getByLabel("Name", { exact: true });
-await nameBox.click();
-await nameBox.pressSequentially("Lambda & Rockets", { delay: 45 });
+await nameBox.fill("");
+await nameBox.pressSequentially("Lambdas & Physics", { delay: 35 });
 await page.waitForTimeout(400);
 const link = await page.getByLabel("Share link").inputValue();
-await glide(page, "button:has-text('Copy')", { pause: 1400 });
+await glide(page, "button:has-text('Copy')", { pause: 1000 });
 marks.share = (Date.now() - t0) / 1000;
 await ctxA.close();
 
@@ -81,9 +79,9 @@ await ctxB.addInitScript(CURSOR);
 const p2 = await ctxB.newPage();
 await p2.goto(link, { waitUntil: "networkidle" });
 await p2.mouse.move(400, 260);
-await p2.waitForTimeout(2600);
-await p2.evaluate(() => window.scrollBy({ top: 360, behavior: "smooth" }));
-await p2.waitForTimeout(1600);
+await p2.waitForTimeout(1800);
+await p2.evaluate(() => window.scrollBy({ top: 380, behavior: "smooth" }));
+await p2.waitForTimeout(1500);
 await ctxB.close();
 await browser.close();
 

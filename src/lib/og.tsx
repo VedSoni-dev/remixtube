@@ -52,7 +52,8 @@ const MARKER = "#f1e05a";
 export async function renderCard(opts: { kicker: string; title: string; topics: string[]; videos: VideoLite[]; footnote: string }) {
   const vids = opts.videos.slice(0, 4);
   const thumbs = await Promise.all(vids.map((v) => thumb(v.id)));
-  const title = opts.title.length > 42 ? `${opts.title.slice(0, 40)}…` : opts.title;
+  const title = opts.title.length > 60 ? `${opts.title.slice(0, 58).trimEnd()}…` : opts.title;
+  const titleSize = title.length <= 18 ? 84 : title.length <= 30 ? 66 : 52;
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", background: PAPER, color: INK, padding: 56, fontFamily: "Geist" }}>
@@ -62,14 +63,14 @@ export async function renderCard(opts: { kicker: string; title: string; topics: 
             <span style={{ fontWeight: 700, letterSpacing: -1, backgroundImage: `linear-gradient(transparent 55%, ${MARKER} 55%)` }}>Remix</span>
           </div>
           <div style={{ display: "flex", marginTop: 46, fontFamily: "Mono", fontSize: 17, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase" }}>{opts.kicker}</div>
-          <div style={{ display: "flex", marginTop: 12, fontFamily: "Serif", fontSize: title.length > 24 ? 66 : 84, lineHeight: 0.98, letterSpacing: -1.5 }}>{title}</div>
+          <div style={{ display: "flex", marginTop: 12, fontFamily: "Serif", fontSize: titleSize, lineHeight: 0.98, letterSpacing: -1.5 }}>{title}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 28 }}>
-            {opts.topics.slice(0, 5).map((t) => (
-              <div key={t} style={{ display: "flex", fontSize: 20, padding: "7px 16px", borderRadius: 999, background: INK, color: PAPER }}>{t}</div>
+            {opts.topics.slice(0, 4).map((t) => (
+              <div key={t} style={{ display: "flex", fontSize: 18, padding: "6px 14px", borderRadius: 999, background: INK, color: PAPER }}>{t}</div>
             ))}
-            {opts.topics.length > 5 && <div style={{ display: "flex", fontSize: 20, padding: "7px 4px", color: MUTED }}>+{opts.topics.length - 5} more</div>}
+            {opts.topics.length > 4 && <div style={{ display: "flex", fontSize: 20, padding: "7px 4px", color: MUTED }}>+{opts.topics.length - 4} more</div>}
           </div>
-          <div style={{ display: "flex", marginTop: "auto", fontSize: 18, color: MUTED, lineHeight: 1.35 }}>{opts.footnote}</div>
+          <div style={{ display: "flex", marginTop: "auto", paddingTop: 18, fontSize: 17, color: MUTED, lineHeight: 1.35 }}>{opts.footnote}</div>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", width: 568, gap: 16, alignContent: "flex-start" }}>
           {vids.map((v, i) => (
@@ -81,7 +82,7 @@ export async function renderCard(opts: { kicker: string; title: string; topics: 
                 <div style={{ display: "flex", width: 276, height: 155, borderRadius: 4, border: `1px solid #d9d4c7`, padding: 14, fontFamily: "Serif", fontSize: 24, lineHeight: 1.05 }}>{v.t.slice(0, 60)}</div>
               )}
               <div style={{ display: "flex", marginTop: 9, fontSize: 18, fontWeight: 600, lineHeight: 1.2, height: 44, overflow: "hidden" }}>{v.t.length > 58 ? `${v.t.slice(0, 56)}…` : v.t}</div>
-              <div style={{ display: "flex", marginTop: 3, fontFamily: "Mono", fontSize: 13, color: MUTED, textTransform: "uppercase" }}>{`${v.c.slice(0, 22)} · ${v.r} HN recs`}</div>
+              <div style={{ display: "flex", marginTop: 3, fontFamily: "Mono", fontSize: 13, color: MUTED, textTransform: "uppercase" }}>{`${v.c.slice(0, 18)} · ${v.r} recommenders`}</div>
             </div>
           ))}
         </div>

@@ -68,7 +68,7 @@ More in [docs/SELF_HOST.md](docs/SELF_HOST.md).
 | Pinned | 17,842,799 bytes, sha256 `c61bd220d1f3899152f63e6b159eece612f4da49727cc9e970bebba70279892e` ([data/source.lock.json](data/source.lock.json)) |
 | Upstream | 6,454 videos · 39,834 labeled HN comments (16,184 recommendations) · 150 topics in 16 areas · co-recommendation graph · bge-small embeddings |
 | TubeRemix keeps | 4,626 videos that at least one commenter recommended, where recommendations outnumber jokes and criticism, minus 14 duplicate uploads |
-| Provenance shown | up to 8 comments per video (recommendations first), verbatim, with author, month, thread title and link |
+| Provenance shown | up to 8 comment excerpts per video (recommendations first, then citations, pushback and jokes, labeled), with author, month, thread title and a link to the full comment; pull quotes are kept only if they occur in the cited comment |
 | License | [ODC-By 1.0](https://opendatacommons.org/licenses/by/1-0/), credit HackerTube and [open-index/hacker-news](https://huggingface.co/datasets/open-index/hacker-news) |
 
 `npm run data:import` downloads the zip once (cached in `.cache/`), refuses a different sha256
@@ -78,8 +78,10 @@ unless you pass `--update-lock`, validates every record against strict schemas
 of per-video hashes so a new export produces an added/removed/changed report.
 
 Not included upstream, and so not here: durations, view counts and other YouTube metadata (the
-YouTube API terms forbid redistributing them). Thumbnails come straight from `i.ytimg.com`;
-videos play only through YouTube's official embed on `youtube-nocookie.com`. Nothing is scraped.
+YouTube API terms forbid redistributing them). Thumbnails are YouTube's public `i.ytimg.com`
+images (share cards embed four of them); videos play only through YouTube's official embed on
+`youtube-nocookie.com`, without loading YouTube's JavaScript into the page. No video or page is
+scraped, and no YouTube API key is used.
 
 ## Architecture
 
@@ -93,15 +95,16 @@ src/components/ UI: builder, cards, player + provenance, share/export, customize
 starter/        the downloadable starter (zero-dependency Node); lib/ is bundled from src/core + src/pipeline
 ```
 
-- The browser downloads only what it needs: the topic index (~17 KB gz), one shard per chosen
-  topic (~20 KB gz each), the staples (~32 KB gz), and a provenance bucket (~9 KB gz) when you
-  open a video. Never the whole dataset.
+- The browser downloads only what it needs: the topic index (~17 KB gzipped), one shard per
+  chosen topic (typically 5–20 KB gzipped), the staples (~32 KB), and one provenance bucket (~9 KB)
+  when you open a video. Never the whole dataset. The landing page's first 12 videos are in the
+  HTML itself.
 - Shared Tubes are rendered on the server with the same ranking code, so a link works in a fresh
   browser, for crawlers, and in the share card.
 - Source adapters ([src/pipeline/sources.ts](src/pipeline/sources.ts)) define how a new community
   source would plug in. Only HackerTube is implemented.
 
-## Personalization: how ranking works
+## How ranking works
 
 Deterministic, explainable, no model calls ([src/core/rank.ts](src/core/rank.ts)). Same inputs,
 same feed. For each eligible video:
@@ -118,7 +121,8 @@ score = 0.50 × interest           # topic match: 1st topic ×1, 2nd ×0.6, 3rd 
       + serendipity jitter: seeded, ±0 / 0.06 / 0.12 / 0.20
 ```
 
-Excluded: "not for me", watched (except on topic pages), unavailable, and news unless enabled.
+Excluded: "not for me", watched (except on topic pages), videos YouTube reported as removed
+(for 30 days), and news unless enabled.
 Then slots are filled greedily with a variety penalty (−0.07 per same primary topic in the last 6
 picks, −0.15 per same channel in the last 10). With serendipity on, every 9th / 6th / 4th slot is
 the best-scored video from outside your topics. The feed ends when your topics run out.
@@ -137,7 +141,9 @@ With no interests it ranks HackerTube's all-time favourites. Every weight is the
 ## Deploy
 
 Any Node host or Vercel (`npm run build`, then `npm run start:public` or Vercel's default). Set
-`NEXT_PUBLIC_SITE_URL`. No database, no secrets. Details in [docs/SELF_HOST.md](docs/SELF_HOST.md).
+`NEXT_PUBLIC_SITE_URL` to your public origin (on Vercel the production URL is used automatically),
+or share cards will point at localhost. No database, no secrets. Details in
+[docs/SELF_HOST.md](docs/SELF_HOST.md).
 
 ## Privacy and analytics
 
@@ -150,8 +156,9 @@ time-to-feed, share, remix and export rates. See `/privacy`.
 ## Bring your own AI
 
 Only officially supported routes: your own API key (OpenAI, Anthropic, OpenRouter), Sign in with
-OpenRouter (OAuth PKCE), and Sign in with ChatGPT plan usage on local installs (OpenAI allows it
-for open-source apps on the user's own computer). Claude subscriptions can't be used by
+OpenRouter (OAuth PKCE), and Sign in with ChatGPT plan usage on local installs started with
+`TUBEREMIX_LOCAL=1 npm start` (OpenAI allows it for open-source apps on the user's own computer;
+the server refuses it unless it is bound to 127.0.0.1). Claude subscriptions can't be used by
 third-party apps under Anthropic's terms, so TubeRemix offers an API key or the Claude Code
 prompt instead. Details: [docs/AI_PROVIDERS.md](docs/AI_PROVIDERS.md).
 

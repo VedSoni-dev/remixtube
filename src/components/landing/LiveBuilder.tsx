@@ -106,7 +106,7 @@ function Builder({ initial }: { initial: BuilderInitial }) {
           </button>
         </div>
 
-        <div className="mt-7 border-t border-hair pt-5">
+        <div className={`mt-7 border-t border-hair pt-5 ${picked.length ? "hidden lg:block" : ""}`}>
           <p className="meta">Step 2</p>
           <button
             type="button"

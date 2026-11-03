@@ -41,10 +41,10 @@ fits in 280 characters (count shown).
 > Data: HackerTube (ODC-By)
 > [REPO]
 
-**5. Surprising demo, with the video** (275)
-> Tap "Functional programming", "Distributed systems", "Space exploration".
+**5. Surprising demo, with the video** (274)
+> Tap "Machine learning", "Functional programming", "Fundamental physics".
 >
-> The grid re-sorts itself into your own HackerTube, live, from the 378 videos HN commenters recommended in those topics. Open one and you get their actual comments.
+> The grid re-sorts itself into your own HackerTube, live, from the 437 videos HN commenters recommended in those topics. Open one and you get their actual comments.
 >
 > Make yours: [LINK]
 
@@ -90,7 +90,8 @@ and claims no endorsement or affiliation. No @-mention needed; it's a reply. Att
 ## Claim check
 
 - ✅ "43M HN comments", "published the data": Karpathy's X post and blog. Attributed to him.
-- ✅ 4,626 videos, 378 videos for the three demo topics: shipped data and the live share card.
+- ✅ 4,626 videos; 437 videos for the three demo topics (Machine learning & deep learning, Functional
+  programming, Fundamental physics): shipped data, the live preview caption and the share card.
 - ✅ "No login": true. AI is optional; keyword matching works without it.
 - ✅ "19 years": HN comments in the data span 2007–2026.
 - ❌ Don't say HackerTube is open source (only its data is), that TubeRemix is official, or that

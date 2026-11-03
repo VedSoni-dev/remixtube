@@ -59,11 +59,12 @@ Server:  /r/<slug>--<token> renders the same ranking (SSR) + OG card (next/og, r
 - [x] OG/X share cards with real thumbnails, name, interests, "Made with TubeRemix"
 - [x] Export: config, playlist (MD/CSV/JSON), YouTube queue, starter ZIP with config, Claude Code prompt
 - [x] /build-your-own guide with tested snippets and attribution/independence statement
-- [x] Bring-your-own AI via sanctioned routes only; core works without AI
+- [x] Bring-your-own AI via sanctioned routes only; core works without AI (ChatGPT/OpenRouter sign-in not verified end to end: needs the owner's accounts)
 - [x] Privacy-conscious analytics + funnel report script
 - [x] Unit tests (vitest) and e2e acceptance (Playwright, desktop + mobile)
-- [x] Independent reviewer passes (product, first-time user/dev, design/a11y, data/security) and fixes
-- [ ] Public GitHub repo (needs owner OK)
+- [x] Independent reviewer passes (product + growth, first-time user + developer, design + accessibility, data + security); all blockers and majors fixed and retested
+- [x] GitHub repo (private: VedSoni-dev/remixtube)
+- [ ] Make it public + v0.1.0 release (needs owner OK)
 - [ ] Public deploy (needs owner OK + Vercel account)
 - [ ] Publik listing (needs public repo + owner approval in browser)
 - [ ] Post on X (owner)

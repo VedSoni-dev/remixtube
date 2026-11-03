@@ -46,11 +46,14 @@ export function VideoCard({
       </button>
       <div className="mt-1 flex items-start gap-2">
         <div className="min-w-0 flex-1">
-          <p className="meta flex min-w-0 gap-1">
-            <span className="truncate">{video.c}</span>
-            {crowd && <span className="shrink-0">· {crowd}</span>}
-          </p>
-          {reason && <p className="mt-1 line-clamp-1 text-[0.7812rem] leading-snug text-ink-2/80">{reason}</p>}
+          <p className="meta truncate">{video.c}</p>
+          {(crowd || reason) && (
+            <p className="mt-1 line-clamp-1 text-[0.7812rem] leading-snug text-ink-2">
+              {crowd && <span className="font-medium text-ink">{crowd}</span>}
+              {crowd && reason ? " · " : ""}
+              {reason}
+            </p>
+          )}
         </div>
         {showActions && (
           <div className="flex shrink-0 gap-0.5 opacity-100 transition-opacity md:opacity-0 md:group-focus-within:opacity-100 md:group-hover:opacity-100">
