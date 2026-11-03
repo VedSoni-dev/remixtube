@@ -23,20 +23,20 @@ export default function TopicsPage() {
       <div className="columns-1 gap-8 md:columns-2 2xl:columns-3">
         {index?.areas.map((a) => (
           <section key={a.id} className="mb-8 break-inside-avoid">
-            <h2 className="border-b border-ink pb-1.5 font-serif text-[24px]">{a.name}</h2>
+            <h2 className="border-b border-ink pb-1.5 font-serif text-[1.5rem]">{a.name}</h2>
             <ul>
               {index.topics.filter((t) => t.area === a.id && t.count > 0).map((t) => {
                 const w = s.prefs.topics[t.id];
                 return (
                   <li key={t.id} className="flex items-center gap-3 border-b border-hair py-2">
-                    <Link href={`/tube/topics/${t.id}`} className="min-w-0 flex-1 text-[14.5px] hover:underline" title={t.description}>
-                      {t.name} <span className="font-mono text-[11px] text-muted">{t.count}</span>
+                    <Link href={`/tube/topics/${t.id}`} className="min-w-0 flex-1 text-[0.9062rem] hover:underline" title={t.description}>
+                      {t.name} <span className="font-mono text-[0.6875rem] text-muted">{t.count}</span>
                     </Link>
                     <select
                       aria-label={`How much ${t.name} in your Tube`}
                       value={w ?? 0}
                       onChange={(e) => setWeight(t.id, Number(e.target.value) as TopicWeight | 0)}
-                      className={`h-8 rounded-full border px-2 text-[12.5px] ${w ? "border-ink bg-ink text-paper" : "border-hair bg-card"}`}
+                      className={`h-8 rounded-full border px-2 text-[0.7812rem] ${w ? "border-ink bg-ink text-paper" : "border-hair bg-card"}`}
                     >
                       <option value={0}>Not in my Tube</option>
                       {([1, 2, 3] as const).map((x) => <option key={x} value={x}>{WEIGHT_LABEL[x]}</option>)}

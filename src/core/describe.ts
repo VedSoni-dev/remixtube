@@ -45,28 +45,42 @@ export function describeWithKeywords(text: string, index: DataIndex, limit = 6):
     const prev = words.slice(Math.max(0, i - 2), i);
     out.formats[ty] = prev.some((p) => p === "no" || p === "not" || p === "less" || p === "without" || p === "skip") ? -1 : 1;
   });
+  const noDeepLearning = raw.replace(/deep[\s-]+(learning|neural|net)/gi, "");
   if (/\b(beginner|intro|introduct|basics|newbie|eli5|gentle)/i.test(raw)) out.depth = "intro";
-  else if (/\b(advanced|deep|in-depth|technical|expert|hardcore)/i.test(raw)) out.depth = "deep";
+  else if (/\b(advanced|deep|in-depth|technical|expert|hardcore)/i.test(noDeepLearning)) out.depth = "deep";
 
+  // Words that name a format, follow a negation, or only describe depth never pick topics.
+  const formatStems = new Set(Object.keys(FORMAT_WORDS));
+  const skip = new Set<string>();
+  words.forEach((w, i) => {
+    if (["no", "not", "without", "skip", "less"].includes(w) && words[i + 1]) skip.add(stem(words[i + 1]!));
+  });
+  const depthWords = new Set(["deep", "technical", "advanced", "beginner", "intro", "basic", "expert", "hardcore", "gentle"].map(stem));
+  const queryWords = [...new Set(q)].filter((w) => !formatStems.has(w) && !skip.has(w) && !depthWords.has(w));
+
+  // Inverse document frequency over the chip topics: rare words are strong signals.
+  const chips = index.topics.filter((t) => t.chip);
+  const docs = chips.map((t) => ({ t, name: new Set(tokens(t.name)), desc: new Set(tokens(t.description)) }));
+  const idf = (w: string) => {
+    const df = docs.filter((d) => d.name.has(w) || d.desc.has(w)).length;
+    return df ? Math.log(1 + docs.length / df) : 0;
+  };
   const scored: { id: string; score: number; terms: string[] }[] = [];
-  for (const t of index.topics) {
-    if (!t.chip) continue;
-    const nameT = new Set(tokens(t.name));
-    const descT = new Set(tokens(t.description));
+  for (const d of docs) {
     let score = 0;
     const terms: string[] = [];
-    for (const w of new Set(q)) {
+    for (const w of queryWords) {
       if (w.length < 3 && !/^(ai|ml|os|ui|ux|vr|ar|3d|c#|c\+\+)$/.test(w)) continue;
-      if (nameT.has(w)) { score += 3; terms.push(w); } else if (descT.has(w)) { score += 1; terms.push(w); }
+      if (d.name.has(w)) { score += 3 * idf(w); terms.push(w); } else if (d.desc.has(w)) { score += idf(w); terms.push(w); }
     }
     // Phrase bonus: two consecutive query words appearing together in the description.
-    const desc = t.description.toLowerCase();
+    const desc = d.t.description.toLowerCase();
     for (let i = 0; i + 1 < q.length; i++) if (desc.includes(`${q[i]} ${q[i + 1]}`)) score += 2;
-    if (score >= 2) scored.push({ id: t.id, score, terms });
+    if (score >= 3) scored.push({ id: d.t.id, score, terms });
   }
   scored.sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
-  const top = scored.slice(0, limit);
-  const best = top[0]?.score ?? 0;
+  const best = scored[0]?.score ?? 0;
+  const top = scored.filter((s) => s.score >= best * 0.3).slice(0, limit);
   for (const s of top) {
     out.topics[s.id] = s.score >= best * 0.8 ? 3 : s.score >= best * 0.5 ? 2 : 1;
     out.matched.push({ id: s.id, terms: s.terms });

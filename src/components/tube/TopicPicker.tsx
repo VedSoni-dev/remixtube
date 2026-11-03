@@ -30,7 +30,7 @@ export function TopicPicker({ index, value, onChange, compact = false }: {
           onChange={(e) => setQ(e.target.value)}
           placeholder="Filter topics"
           aria-label="Filter topics"
-          className="h-10 w-full max-w-xs rounded-full border border-hair bg-card px-4 text-[14px] outline-none focus:border-ink"
+          className="h-10 w-full max-w-xs rounded-full border border-line bg-card px-4 text-[0.875rem] outline-none focus:border-ink"
         />
         <span className="meta">{count} / {MAX_TOPICS} picked</span>
       </div>
@@ -52,11 +52,11 @@ export function TopicPicker({ index, value, onChange, compact = false }: {
                       aria-pressed={on}
                       title={t.description}
                       disabled={!on && count >= MAX_TOPICS}
-                      className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[13.5px] font-medium transition-colors disabled:opacity-40 ${on ? "border-ink bg-ink text-paper" : "border-hair bg-card hover:border-ink/40"}`}
+                      className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[0.8438rem] font-medium transition-colors disabled:opacity-40 ${on ? "border-ink bg-ink text-paper" : "border-hair bg-card hover:border-ink/40"}`}
                     >
                       {on ? <Check size={14} aria-hidden /> : <Plus size={14} aria-hidden className="text-muted" />}
                       {t.name}
-                      <span className={`font-mono text-[10.5px] tabular-nums ${on ? "text-paper/70" : "text-muted"}`}>{t.count}</span>
+                      <span className={`font-mono text-[0.6562rem] tabular-nums ${on ? "text-paper/70" : "text-muted"}`}>{t.count}</span>
                     </button>
                   );
                 })}

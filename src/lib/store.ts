@@ -14,6 +14,13 @@ export interface Snap {
   at: number;
 }
 
+/** A Tube you made or remixed earlier, kept when you start or remix another. */
+export interface SavedTube {
+  prefs: Prefs;
+  parent: string | null;
+  at: number;
+}
+
 export interface State {
   v: 1;
   prefs: Prefs;
@@ -27,16 +34,29 @@ export interface State {
   unavailable: Record<string, number>;
   thumbs: "creator" | "frame";
   lastImpressionDay: string;
+  tubes: SavedTube[];
 }
 
 const KEY = "tuberemix:v1";
 const HISTORY_CAP = 400;
+const TUBES_CAP = 20;
+
+function samePrefs(a: Prefs, b: Prefs): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+/** Keeps the current Tube in the "Your Tubes" list before it's replaced. */
+function archived(s: State): SavedTube[] {
+  if (!s.hasTube || !Object.keys(s.prefs.topics).length) return s.tubes;
+  const rest = s.tubes.filter((t) => !samePrefs(t.prefs, s.prefs));
+  return [{ prefs: s.prefs, parent: s.parent, at: Date.now() }, ...rest].slice(0, TUBES_CAP);
+}
 
 function initial(): State {
   return {
     v: 1, prefs: defaultPrefs(), hasTube: false, parent: null,
     liked: {}, disliked: {}, later: {}, history: [], impressions: {}, unavailable: {},
-    thumbs: "creator", lastImpressionDay: "",
+    thumbs: "creator", lastImpressionDay: "", tubes: [],
   };
 }
 
@@ -90,20 +110,32 @@ function parse(o: unknown): State {
   s.unavailable = numRecord(r.unavailable);
   s.thumbs = r.thumbs === "frame" ? "frame" : "creator";
   s.lastImpressionDay = typeof r.lastImpressionDay === "string" ? r.lastImpressionDay : "";
+  s.tubes = Array.isArray(r.tubes)
+    ? r.tubes.slice(0, TUBES_CAP).filter((t): t is SavedTube => !!t && typeof t === "object" && typeof (t as SavedTube).at === "number").map((t) => ({
+        prefs: sanitizePrefs(t.prefs, known ?? new Set(Object.keys((t.prefs as { topics?: object })?.topics ?? {}))),
+        parent: typeof t.parent === "string" && /^[0-9a-z]{6}$/.test(t.parent) ? t.parent : null,
+        at: t.at,
+      }))
+    : [];
   return s;
 }
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
+function flush(): void {
+  if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+  try {
+    window.localStorage.setItem(KEY, JSON.stringify(state));
+  } catch {
+    /* storage full or blocked: the session still works in memory */
+  }
+}
 function persist(): void {
   if (typeof window === "undefined") return;
   if (saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(state));
-    } catch {
-      /* storage full or blocked: the session still works in memory */
-    }
-  }, 120);
+  saveTimer = setTimeout(flush, 120);
+}
+if (typeof window !== "undefined") {
+  window.addEventListener("pagehide", () => { if (saveTimer) flush(); });
 }
 
 function emit(): void {
@@ -162,8 +194,27 @@ export function snap(v: Pick<VideoLite, "id" | "t" | "c" | "k">): Snap {
 }
 
 export const actions = {
-  setPrefs(prefs: Prefs, opts: { parent?: string | null } = {}) {
-    setState((s) => ({ ...s, prefs, hasTube: true, parent: opts.parent === undefined ? s.parent : opts.parent }));
+  /** With `archive`, the current Tube (if different) is saved to "Your Tubes" first. */
+  setPrefs(prefs: Prefs, opts: { parent?: string | null; archive?: boolean } = {}) {
+    setState((s) => ({
+      ...s,
+      tubes: opts.archive && !samePrefs(s.prefs, prefs) ? archived(s) : s.tubes,
+      prefs,
+      // A Tube needs at least one topic; a name alone doesn't make one.
+      hasTube: s.hasTube || Object.keys(prefs.topics).length > 0,
+      parent: opts.parent === undefined ? s.parent : opts.parent,
+    }));
+  },
+  switchTube(i: number) {
+    setState((s) => {
+      const t = s.tubes[i];
+      if (!t) return s;
+      const tubes = archived(s).filter((x) => !samePrefs(x.prefs, t.prefs));
+      return { ...s, prefs: t.prefs, parent: t.parent, hasTube: true, tubes };
+    });
+  },
+  deleteTube(i: number) {
+    setState((s) => ({ ...s, tubes: s.tubes.filter((_, j) => j !== i) }));
   },
   toggleLike(v: Pick<VideoLite, "id" | "t" | "c" | "k">) {
     setState((s) => {
@@ -218,15 +269,20 @@ export const actions = {
   },
   resetAll() {
     setState(() => initial());
+    flush();
   },
 };
 
+const UNAVAILABLE_TTL = 30 * 24 * 3600 * 1000;
+
 export function signalsFrom(s: State): Signals {
+  const now = Date.now();
   return buildSignals({
     liked: Object.values(s.liked),
     disliked: Object.values(s.disliked),
     watched: s.history.map((h) => h.id),
-    unavailable: Object.keys(s.unavailable),
+    // Only YouTube's own "video not found" marks a video; the mark expires after 30 days.
+    unavailable: Object.entries(s.unavailable).filter(([, at]) => now - at < UNAVAILABLE_TTL).map(([id]) => id),
     impressions: Object.entries(s.impressions),
   });
 }

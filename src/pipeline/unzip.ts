@@ -1,13 +1,16 @@
 // Minimal ZIP reader (stored + deflate) on top of node:zlib. No dependencies.
 import { inflateRawSync } from "node:zlib";
+import { crc32 } from "../core/zip";
 
 export interface ZipEntry {
   name: string;
   data: Buffer;
 }
 
-export function readZip(buf: Buffer, opts: { maxEntryBytes?: number } = {}): ZipEntry[] {
+export function readZip(buf: Buffer, opts: { maxEntryBytes?: number; maxTotalBytes?: number } = {}): ZipEntry[] {
   const max = opts.maxEntryBytes ?? 256 * 1024 * 1024;
+  const maxTotal = opts.maxTotalBytes ?? 512 * 1024 * 1024;
+  let total = 0;
   // Find the End Of Central Directory record (it sits within the last 64 KiB + 22 bytes).
   let eocd = -1;
   for (let i = buf.length - 22; i >= Math.max(0, buf.length - 65557); i--) {
@@ -22,6 +25,7 @@ export function readZip(buf: Buffer, opts: { maxEntryBytes?: number } = {}): Zip
   for (let n = 0; n < count; n++) {
     if (buf.readUInt32LE(p) !== 0x02014b50) throw new Error("zip: bad central directory entry");
     const method = buf.readUInt16LE(p + 10);
+    const crc = buf.readUInt32LE(p + 16);
     const compSize = buf.readUInt32LE(p + 20);
     const size = buf.readUInt32LE(p + 24);
     const nameLen = buf.readUInt16LE(p + 28);
@@ -43,6 +47,9 @@ export function readZip(buf: Buffer, opts: { maxEntryBytes?: number } = {}): Zip
     else if (method === 8) data = inflateRawSync(raw, { maxOutputLength: max });
     else throw new Error(`zip: unsupported compression method ${method} for ${name}`);
     if (data.length !== size) throw new Error(`zip: size mismatch for ${name}`);
+    if (crc32(data) !== crc) throw new Error(`zip: CRC mismatch for ${name}`);
+    total += size;
+    if (total > maxTotal) throw new Error(`zip: archive expands past ${maxTotal} bytes`);
     out.push({ name, data });
   }
   return out;

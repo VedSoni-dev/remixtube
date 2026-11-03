@@ -2,13 +2,13 @@ import type { NextConfig } from "next";
 
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://www.youtube.com https://s.ytimg.com`,
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://i.ytimg.com",
   "font-src 'self'",
   "frame-src https://www.youtube-nocookie.com https://www.youtube.com",
   // Bring-your-own AI calls go straight from the browser to the provider the user picked.
-  "connect-src 'self' https://api.openai.com https://api.anthropic.com https://openrouter.ai https://publikhq.com",
+  "connect-src 'self' https://api.openai.com https://api.anthropic.com https://openrouter.ai",
   "object-src 'none'",
   "base-uri 'none'",
   "form-action 'self'",
@@ -19,6 +19,8 @@ const dataFiles = ["./public/data/index.json", "./public/data/staples.json", "./
 const cardFiles = [...dataFiles, "./src/assets/fonts/*.ttf", "./node_modules/next/dist/compiled/@vercel/og/Geist-Regular.ttf"];
 
 const config: NextConfig = {
+  // Lets a second build (e.g. for recordings) live next to the main one.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
   reactStrictMode: true,
   outputFileTracingIncludes: {

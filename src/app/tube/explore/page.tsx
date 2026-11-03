@@ -21,6 +21,7 @@ export default function ExplorePage() {
   const s = useStore();
   const [area, setArea] = useState<string | null>(null);
   const [shard, setShard] = useState<Shard | null>(null);
+  const [failed, setFailed] = useState(false);
   const [sort, setSort] = useState<Sort>("best");
   const [type, setType] = useState<ContentType | "all">("all");
   const [era, setEra] = useState<Era>("all");
@@ -31,8 +32,9 @@ export default function ExplorePage() {
     if (!area) return;
     let live = true;
     setShard(null);
+    setFailed(false);
     setLimit(PAGE);
-    loadAreaShard(area).then((sh) => live && setShard(sh)).catch(() => live && setShard({ id: area, videos: [] }));
+    loadAreaShard(area).then((sh) => live && setShard(sh)).catch(() => { if (live) { setFailed(true); setShard({ id: area, videos: [] }); } });
     return () => { live = false; };
   }, [area]);
 
@@ -51,46 +53,47 @@ export default function ExplorePage() {
     return [...c.entries()].sort((a, b) => b[1] - a[1]);
   }, [shard]);
 
-  const tab = (on: boolean) => `h-9 shrink-0 rounded-full border px-4 text-[13.5px] font-medium ${on ? "border-ink bg-ink text-paper" : "border-hair hover:border-ink/40"}`;
+  const tab = (on: boolean) => `h-10 shrink-0 rounded-full border px-4 text-[0.8438rem] font-medium ${on ? "border-ink bg-ink text-paper" : "border-line hover:border-ink"}`;
   return (
     <div>
       <PageHead kicker="Explore" title="Wander the whole map.">
         All {index?.stats.videos.toLocaleString("en-US") ?? "…"} videos, area by area, outside your feed’s ranking. Sorted by HackerTube’s lasting-recommendation score unless you choose otherwise.
       </PageHead>
-      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6" role="tablist" aria-label="Areas">
+      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:mx-0 md:flex-wrap md:overflow-visible md:px-0" role="group" aria-label="Areas">
         {index?.areas.map((a) => (
-          <button key={a.id} role="tab" aria-selected={a.id === area} type="button" onClick={() => setArea(a.id)} className={tab(a.id === area)}>
-            {a.name} <span className="font-mono text-[10.5px] opacity-70">{a.count}</span>
+          <button key={a.id} aria-pressed={a.id === area} type="button" onClick={() => setArea(a.id)} className={tab(a.id === area)}>
+            {a.name} <span className="font-mono text-[0.6562rem] opacity-70">{a.count}</span>
           </button>
         ))}
       </div>
-      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-hair pb-4 text-[13.5px]">
+      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-hair pb-4 text-[0.8438rem]">
         <label className="flex items-center gap-2">Sort
-          <select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="h-9 rounded-full border border-hair bg-card px-3">
+          <select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="h-9 rounded-full border border-line bg-card px-3">
             <option value="best">Most lasting recommendations</option>
             <option value="people">Most recommenders</option>
             <option value="recent">Recently recommended</option>
           </select>
         </label>
         <label className="flex items-center gap-2">Format
-          <select value={type} onChange={(e) => setType(e.target.value as ContentType | "all")} className="h-9 rounded-full border border-hair bg-card px-3">
+          <select value={type} onChange={(e) => setType(e.target.value as ContentType | "all")} className="h-9 rounded-full border border-line bg-card px-3">
             <option value="all">All formats</option>
             {types.map(([t, n]) => <option key={t} value={t}>{t} ({n})</option>)}
           </select>
         </label>
         <label className="flex items-center gap-2">First on HN
-          <select value={era} onChange={(e) => setEra(e.target.value as Era)} className="h-9 rounded-full border border-hair bg-card px-3">
+          <select value={era} onChange={(e) => setEra(e.target.value as Era)} className="h-9 rounded-full border border-line bg-card px-3">
             {ERAS.map((e) => <option key={e.id} value={e.id}>{e.label}</option>)}
           </select>
         </label>
         <span className="meta ml-auto">{shard ? `${list.length} videos` : "Loading"}</span>
       </div>
       <div className="mt-6">
-        <Grid items={list.slice(0, limit)} loading={!shard} n={12} />
-        {shard && !list.length && <Empty title="No videos match.">Try another format or time range.</Empty>}
+        <Grid heading="Videos" items={list.slice(0, limit)} loading={!shard} n={12} />
+        {failed && <Empty title="Couldn’t load this area.">Check your connection, then pick the area again.</Empty>}
+        {shard && !failed && !list.length && <Empty title="No videos match.">Try another format or time range.</Empty>}
         {list.length > limit && (
           <div className="mt-10 flex justify-center">
-            <button type="button" onClick={() => setLimit((l) => l + PAGE)} className="h-11 rounded-full border border-ink px-6 text-[14px] font-semibold hover:bg-ink hover:text-paper">Show more</button>
+            <button type="button" onClick={() => setLimit((l) => l + PAGE)} className="h-11 rounded-full border border-ink px-6 text-[0.875rem] font-semibold hover:bg-ink hover:text-paper">Show more</button>
           </div>
         )}
       </div>

@@ -5,7 +5,7 @@
 
 export const EVENTS = [
   "landing_view", "builder_started", "interests_selected", "feed_generated", "video_opened",
-  "share_created", "shared_remix_opened", "remix_of_remix", "export",
+  "share_created", "shared_remix_opened", "remix_created", "remix_of_remix", "export",
 ] as const;
 export type EventName = (typeof EVENTS)[number];
 

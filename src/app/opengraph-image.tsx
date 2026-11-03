@@ -9,7 +9,7 @@ export const alt = "TubeRemix: Make your own HackerTube.";
 export default async function Image() {
   const [index, staples] = await Promise.all([readIndex(), readJson<Shard>("staples.json")]);
   return renderCard({
-    kicker: "Built on Karpathy’s HackerTube data",
+    kicker: "An independent remix of HackerTube’s open data",
     title: "Make your own HackerTube.",
     topics: ["Pick interests", "Get a feed", "Share it"],
     videos: staples.videos.slice(0, 4),

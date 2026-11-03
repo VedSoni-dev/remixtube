@@ -16,7 +16,7 @@
     "dev": "next dev -H 127.0.0.1 -p 3000",
     "build": "npm run prepare:data && next build",
     "start": "next start -H 127.0.0.1 -p 3000",
-    "start:public": "next start -p ${PORT:-3000}",
+    "start:public": "next start",
     "typecheck": "tsc --noEmit",
     "test": "npm run starter:build && vitest run",
     "test:e2e": "playwright test",
@@ -28,7 +28,7 @@
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "server-only": "^0.0.1",
-    "zod": "4.1.12"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",

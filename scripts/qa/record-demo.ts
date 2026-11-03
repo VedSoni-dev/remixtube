@@ -48,12 +48,9 @@ await page.waitForTimeout(2200);
 await page.evaluate(() => document.querySelector("#build")?.scrollIntoView({ behavior: "smooth" }));
 await page.waitForTimeout(1300);
 const marks: Record<string, number> = { interests: (Date.now() - t0) / 1000 };
-for (const name of ["Functional programming", "Distributed systems"]) {
-  await glide(page, `#build button:has-text("${name}")`, { pause: 1700 });
+for (const name of ["Machine learning & deep learning", "Functional programming", "Fundamental physics"]) {
+  await glide(page, `#build button:has-text("${name}")`, { pause: 1800 });
 }
-await page.locator("#build button:has-text('Browse all')").click();
-await page.waitForTimeout(300);
-await glide(page, `#build button:has-text("Space exploration")`, { pause: 2000 });
 await page.evaluate(() => window.scrollBy({ top: -200, behavior: "smooth" }));
 await page.waitForTimeout(500);
 await glide(page, `#build button:has-text("Make my Tube")`, { pause: 300 });

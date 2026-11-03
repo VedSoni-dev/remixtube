@@ -19,7 +19,8 @@ const limit = Math.max(1, Math.min(500, Number(opt("--limit") ?? 60)));
 const config = JSON.parse(readFileSync(join(here, "tuberemix.config.json"), "utf8"));
 if (config.tuberemix !== 1) throw new Error("tuberemix.config.json: expected \"tuberemix\": 1");
 const source = config.source ?? {};
-const dataUrl = source.data_url || hackertube.dataUrl;
+// Only an https URL from the config is used; anything else falls back to HackerTube itself.
+const dataUrl = /^https:\/\//i.test(source.data_url ?? "") ? source.data_url : hackertube.dataUrl;
 
 async function getZip() {
   const local = opt("--data");
@@ -37,6 +38,7 @@ async function getZip() {
 
 const zip = await getZip();
 const sha = createHash("sha256").update(zip).digest("hex");
+if (!source.zip_sha256) console.warn(`No zip_sha256 in your config, so the data isn't pinned. This download's sha256: ${sha}`);
 if (source.zip_sha256 && sha !== source.zip_sha256) {
   const msg = `The dataset changed upstream (sha256 ${sha.slice(0, 12)}…, your config expects ${source.zip_sha256.slice(0, 12)}…).`;
   if (!args.includes("--accept-new-data")) {

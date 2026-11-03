@@ -17,3 +17,4 @@ analytics-events.jsonl
 /public/data/
 /public/download/
 /starter/lib/
+.next-*/

@@ -13,8 +13,10 @@
     "no_recommenders": 1658,
     "net_negative": 156,
     "duplicate_titles": 14,
+    "no_categories": 0,
     "unknown_categories": 0,
-    "orphan_mentions": 0
+    "orphan_mentions": 0,
+    "unverified_quotes": 26
   },
   "output": {
     "videos": 4626,
@@ -22,7 +24,7 @@
     "topics": 150,
     "chips": 133,
     "files": 1193,
-    "bytes": 31588931
+    "bytes": 31897062
   },
   "duplicate_title_examples": [
     {
@@ -95,10 +97,5 @@
       "dropped": "cjriSNgFHsM",
       "title": "BeOS Demo Video"
     }
-  ],
-  "diff": {
-    "added": 0,
-    "removed": 0,
-    "changed": 4626
-  }
+  ]
 }

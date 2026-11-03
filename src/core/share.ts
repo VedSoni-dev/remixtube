@@ -13,7 +13,8 @@ const LETTER_FORMAT = Object.fromEntries(Object.entries(FORMAT_LETTER).map(([k, 
 const DEPTH = { any: "a", intro: "i", deep: "d" } as const;
 const DEPTH_BACK: Record<string, Prefs["depth"]> = { a: "any", i: "intro", d: "deep" };
 
-export const MAX_TOKEN = 360;
+// 16 topics, every format and a 48-emoji name fit comfortably.
+export const MAX_TOKEN = 480;
 
 function b64urlEncode(s: string): string {
   const bytes = new TextEncoder().encode(s);

@@ -1,6 +1,6 @@
 "use client";
 import { Check, Copy, Download, ExternalLink, FileJson, FileText, Package, Share2, Sheet, Terminal, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { claudeCodePrompt, playlistCsv, playlistJson, playlistMarkdown, toConfig, youtubeQueueUrl } from "@/core/exporters";
 import { cleanName } from "@/core/prefs";
@@ -8,6 +8,7 @@ import { sharePath } from "@/core/share";
 import { writeZip } from "@/core/zip";
 import { track } from "@/lib/analytics";
 import { actions, signalsFrom, useStore } from "@/lib/store";
+import { useModal } from "@/lib/useModal";
 import { useFeed } from "@/lib/useFeed";
 
 function download(name: string, data: BlobPart, type: string) {
@@ -47,14 +48,7 @@ function ShareDialog({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState(s.prefs.name);
   const [copied, setCopied] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const closeRef = useRef<HTMLButtonElement | null>(null);
-
-  useEffect(() => {
-    closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const ref = useModal<HTMLDivElement>(onClose);
 
   const prefs = useMemo(() => ({ ...s.prefs, name: cleanName(name) }), [s.prefs, name]);
   const path = sharePath({ prefs, parent: s.parent });
@@ -93,8 +87,8 @@ function ShareDialog({ onClose }: { onClose: () => void }) {
       const files = (await res.json()) as Record<string, string>;
       const entries = Object.entries(files)
         .filter(([n]) => n !== "tuberemix.config.json")
-        .map(([n, d]) => ({ name: `${fileBase}/${n}`, data: d }));
-      entries.push({ name: `${fileBase}/tuberemix.config.json`, data: JSON.stringify(config, null, 2) + "\n" });
+        .map(([n, d]) => ({ name: `my-tube/${n}`, data: d }));
+      entries.push({ name: "my-tube/tuberemix.config.json", data: JSON.stringify(config, null, 2) + "\n" });
       download(`${fileBase}-starter.zip`, writeZip(entries) as BlobPart, "application/zip");
       track("export", { kind: "starter" });
     } finally {
@@ -106,13 +100,13 @@ function ShareDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/50 sm:items-center sm:p-6" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div role="dialog" aria-modal="true" aria-labelledby="share-title" className="fade-in max-h-[92dvh] w-full max-w-[720px] overflow-y-auto rounded-t-[10px] bg-paper p-5 shadow-2xl sm:rounded-[8px] sm:p-7">
+      <div ref={ref} role="dialog" aria-modal="true" aria-labelledby="share-title" className="fade-in max-h-[92dvh] w-full max-w-[720px] overflow-y-auto rounded-t-[10px] bg-paper p-5 shadow-2xl sm:rounded-[8px] sm:p-7">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="meta">Share &amp; export</p>
             <h2 id="share-title" className="mt-1 font-serif text-[34px] leading-none">Send your Tube anywhere.</h2>
           </div>
-          <button ref={closeRef} type="button" onClick={onClose} aria-label="Close" className="grid h-9 w-9 shrink-0 place-items-center rounded-full hover:bg-paper-2"><X size={18} /></button>
+          <button type="button" onClick={onClose} aria-label="Close" className="grid h-10 w-10 shrink-0 place-items-center rounded-full hover:bg-paper-2"><X size={18} /></button>
         </div>
 
         <label className="mt-6 block text-[13px] font-semibold" htmlFor="tube-name">Name</label>
@@ -136,7 +130,7 @@ function ShareDialog({ onClose }: { onClose: () => void }) {
             <button type="button" onClick={nativeShare} aria-label="Share with another app" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-hair"><Share2 size={16} /></button>
           )}
         </div>
-        <p className="mt-2 text-[12.5px] text-muted">The link is the recipe: anyone who opens it gets this exact feed, nothing is stored on a server. Your likes and history are not included.</p>
+        <p className="mt-2 text-[12.5px] text-muted">The link is the recipe (topics, formats, order seed), so anyone who opens it gets this Tube, and nothing is stored on a server. Your likes and history stay with you, so their feed starts where yours did before you tuned it.</p>
 
         <div className="mt-5 overflow-hidden rounded-[4px] border border-hair">
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -2,7 +2,7 @@
 import { detailBucket } from "./hash";
 import type { Prefs } from "./prefs";
 import type { RankContext } from "./rank";
-import type { DataIndex, Shard, VideoDetail, VideoLite } from "./types";
+import type { DataIndex, Shard, Topic, VideoDetail, VideoLite } from "./types";
 
 export type JsonLoader = <T>(path: string) => Promise<T>;
 
@@ -57,4 +57,31 @@ export function youtubeUrl(id: string): string {
 
 export function hnItemUrl(id: number): string {
   return `https://news.ycombinator.com/item?id=${id}`;
+}
+
+/**
+ * Honest description of a feed's pool: how many videos match the topics directly. Feeds may also
+ * contain "next door" (same area) and serendipity picks, so never say "top N of M" when M < N.
+ */
+export function poolLine(shown: number, pool: number, topics: number): string {
+  if (!topics) return `The ${shown} videos HN recommended most, across every topic.`;
+  if (pool >= shown) return `The top ${shown} of ${pool.toLocaleString("en-US")} videos HN recommended in ${topics === 1 ? "this topic" : "these topics"}.`;
+  return `${pool.toLocaleString("en-US")} video${pool === 1 ? "" : "s"} match${pool === 1 ? "es" : ""} ${topics === 1 ? "this topic" : "these topics"} directly; the rest are nearby HN favourites.`;
+}
+
+/** The largest chip topic from each area, in the taxonomy's own area order (software first). */
+export function starterChips(index: DataIndex): Topic[] {
+  const chips = index.topics.filter((t) => t.chip);
+  const out: Topic[] = [];
+  for (const a of index.areas) out.push(...chips.filter((t) => t.area === a.id).sort((x, y) => y.count - x.count).slice(0, 1));
+  return out;
+}
+
+/** A readable default name from the picks, e.g. "Machine learning & Fundamental physics". */
+export function autoName(topicIds: string[], names: ReadonlyMap<string, string>): string {
+  const short = topicIds.map((t) => (names.get(t) ?? "").split(/\s*(?:&|,|\()\s*/)[0]!.trim()).filter(Boolean);
+  if (!short.length) return "";
+  const two = short.slice(0, 2).join(" & ");
+  const name = short.length > 2 ? `${two} +${short.length - 2}` : two;
+  return name.length <= 48 ? name : short[0]!.slice(0, 48);
 }

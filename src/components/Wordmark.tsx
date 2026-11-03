@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export function Wordmark({ href = "/", size = "md" }: { href?: string; size?: "md" | "lg" }) {
-  const cls = size === "lg" ? "text-[28px]" : "text-[22px]";
+  const cls = size === "lg" ? "text-[1.75rem]" : "text-[1.375rem]";
   return (
     <Link href={href} aria-label="TubeRemix home" className={`group inline-flex items-baseline gap-0 leading-none ${cls}`}>
       <span className="font-serif italic tracking-[-0.01em]">Tube</span>

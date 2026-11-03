@@ -46,13 +46,13 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
               else topics[topic.id] = 2;
               actions.setPrefs({ ...s.prefs, topics });
             }}
-            className={`mt-4 h-10 rounded-full px-5 text-[14px] font-semibold ${inTube ? "border border-ink" : "bg-ink text-paper"}`}
+            className={`mt-4 h-10 rounded-full px-5 text-[0.875rem] font-semibold ${inTube ? "border border-ink" : "bg-ink text-paper"}`}
           >
             {inTube ? "Remove from my Tube" : "Add to my Tube"}
           </button>
         )}
       </PageHead>
-      <Grid items={items} loading={!shard} n={12} startRank={1} />
+      <Grid heading="Videos in this topic" items={items} loading={!shard} n={12} startRank={1} />
       {shard && !items.length && <Empty title="Nothing to show here.">Every video in this topic is hidden or marked unavailable.</Empty>}
     </div>
   );

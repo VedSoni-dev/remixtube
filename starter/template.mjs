@@ -76,7 +76,8 @@ ${items.map((r, i) => card(r, i, details)).join("\n")}
 </main>
 <footer>
   <p>${esc(index.source.attribution)} Licensed <a href="${esc(index.source.license_url)}">ODC-By 1.0</a>. Data exported ${esc(index.source.exported)}.</p>
-  <p>Built from a TubeRemix config${config.share_url ? ` (<a href="${esc(config.share_url)}">original Tube</a>)` : ""}. Not affiliated with HackerTube, YouTube or Hacker News.</p>
+  <p>Hacker News data is provided by Y Combinator; comments remain the work of their authors.</p>
+  <p>Built from a TubeRemix config${/^https?:\/\//i.test(config.share_url ?? "") ? ` (<a href="${esc(config.share_url)}">original Tube</a>)` : ""}. Not affiliated with HackerTube, YouTube or Hacker News.</p>
 </footer>
 <script>
   document.addEventListener("click", function (e) {
@@ -88,7 +89,10 @@ ${items.map((r, i) => card(r, i, details)).join("\n")}
     f.src = "https://www.youtube-nocookie.com/embed/" + id + "?autoplay=1&rel=0";
     f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
     f.title = b.getAttribute("aria-label");
-    b.replaceWith(f);
+    var frame = document.createElement("div");
+    frame.className = "thumb";
+    frame.appendChild(f);
+    b.replaceWith(frame);
   });
 </script>
 </body>

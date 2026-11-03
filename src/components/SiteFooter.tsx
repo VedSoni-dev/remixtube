@@ -8,9 +8,9 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-[1280px] gap-8 px-4 py-12 sm:px-8 md:grid-cols-[1.2fr_1fr_1fr]">
         <div>
           <Wordmark />
-          <p className="mt-3 max-w-[46ch] text-[13.5px] leading-relaxed text-muted">{DISCLAIMER}</p>
+          <p className="mt-3 max-w-[46ch] text-[0.8438rem] leading-relaxed text-muted">{DISCLAIMER}</p>
         </div>
-        <div className="text-[13.5px] leading-relaxed text-ink-2">
+        <div className="text-[0.8438rem] leading-relaxed text-ink-2">
           <p className="meta mb-2">Data</p>
           <p>
             Videos, topics and HN comments come from{" "}
@@ -19,7 +19,7 @@ export function SiteFooter() {
             <a className="underline underline-offset-2" href={SITE.hnArchive}>open-index/hacker-news</a> archive. Hacker News data is provided by Y Combinator; comments remain the work of their authors. Video titles and channel names belong to their creators.
           </p>
         </div>
-        <div className="text-[13.5px] text-ink-2">
+        <div className="text-[0.8438rem] text-ink-2">
           <p className="meta mb-2">TubeRemix</p>
           <ul className="space-y-1.5">
             <li><Link className="hover:underline" href="/#build">Build my Tube</Link></li>

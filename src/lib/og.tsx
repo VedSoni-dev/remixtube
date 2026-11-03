@@ -19,8 +19,20 @@ function loadFonts() {
   return fonts;
 }
 
-/** Fetches a real YouTube thumbnail as a data URI; null when it is missing or slow. */
-async function thumb(id: string): Promise<string | null> {
+const thumbCache = new Map<string, Promise<string | null>>();
+
+/** Fetches a real YouTube thumbnail (the public i.ytimg.com image) as a data URI; null when missing or slow. */
+function thumb(id: string): Promise<string | null> {
+  let p = thumbCache.get(id);
+  if (!p) {
+    p = fetchThumb(id);
+    thumbCache.set(id, p);
+    if (thumbCache.size > 500) thumbCache.delete(thumbCache.keys().next().value!);
+  }
+  return p;
+}
+
+async function fetchThumb(id: string): Promise<string | null> {
   try {
     const res = await fetch(`https://i.ytimg.com/vi/${id}/mqdefault.jpg`, { signal: AbortSignal.timeout(3500) });
     if (!res.ok) return null;
@@ -75,6 +87,11 @@ export async function renderCard(opts: { kicker: string; title: string; topics: 
         </div>
       </div>
     ),
-    { ...OG_SIZE, fonts: await loadFonts() },
+    {
+      ...OG_SIZE,
+      fonts: await loadFonts(),
+      // A token always renders the same card, so it can be cached hard.
+      headers: { "Cache-Control": "public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800" },
+    },
   );
 }

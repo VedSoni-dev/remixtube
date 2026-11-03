@@ -29,7 +29,7 @@ export function Thumb({
       {missing ? (
         <div className="absolute inset-0 flex flex-col justify-between border border-hair bg-card p-3">
           <span className="meta">No thumbnail</span>
-          <span className="line-clamp-3 font-serif text-[19px] leading-[1.1] text-ink-2">{title}</span>
+          <span className="line-clamp-3 font-serif text-[1.1875rem] leading-[1.1] text-ink-2">{title}</span>
           <span className="meta truncate">{channel}</span>
         </div>
       ) : (
@@ -37,7 +37,7 @@ export function Thumb({
         <img
           src={thumbUrl(id, style, "hq")}
           srcSet={`${thumbUrl(id, style, "mq")} 320w, ${thumbUrl(id, style, "hq")} 480w`}
-          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 320px"
+          sizes="(min-width: 1400px) 22vw, (min-width: 768px) 30vw, (min-width: 480px) 48vw, 92vw"
           alt=""
           loading={priority ? "eager" : "lazy"}
           decoding="async"

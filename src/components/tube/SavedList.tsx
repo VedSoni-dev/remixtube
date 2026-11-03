@@ -33,7 +33,7 @@ export function SavedList({ list }: { list: keyof typeof COPY }) {
                 <button type="button" onClick={() => player.openId(x.id)} className="group flex min-w-0 flex-1 items-center gap-4 text-left">
                   <div className="w-36 shrink-0 sm:w-44"><Thumb id={x.id} title={x.t} channel={x.c} style={s.thumbs} /></div>
                   <div className="min-w-0">
-                    <p className="line-clamp-2 text-[15px] font-semibold group-hover:underline">{x.t}</p>
+                    <p className="line-clamp-2 text-[0.9375rem] font-semibold group-hover:underline">{x.t}</p>
                     <p className="meta mt-1 truncate">{x.c} · {new Date(x.at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p>
                   </div>
                 </button>
@@ -46,7 +46,7 @@ export function SavedList({ list }: { list: keyof typeof COPY }) {
           <button
             type="button"
             onClick={() => { if (window.confirm(`Clear all of ${c.kicker}?`)) actions.clear(list); }}
-            className="mt-6 text-[13.5px] text-muted underline underline-offset-4 hover:text-ink"
+            className="mt-6 text-[0.8438rem] text-muted underline underline-offset-4 hover:text-ink"
           >
             Clear {c.kicker}
           </button>

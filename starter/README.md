@@ -13,7 +13,9 @@ node build.mjs
 node serve.mjs
 ```
 
-Open the printed URL (http://127.0.0.1:4173/).
+Open the printed URL (http://127.0.0.1:4173/). If that port is busy: `node serve.mjs --port 4180`.
+
+On Windows, the same two commands work in PowerShell, Command Prompt or Git Bash.
 
 `build.mjs` does this:
 

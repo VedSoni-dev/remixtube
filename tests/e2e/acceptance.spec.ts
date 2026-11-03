@@ -16,10 +16,10 @@ test("a new visitor builds, watches, shares and exports a Tube", async ({ page, 
     if (!(await chip.count())) await page.getByRole("button", { name: /Browse all/ }).click();
     await page.locator("#build").getByRole("button", { name: new RegExp(`^${name}`) }).first().click();
   }
-  await expect(page.locator("#build")).toContainText(/Your top 12 from \d+ videos/);
+  await expect(page.locator("#build")).toContainText(/The top 12 of \d+ videos HN recommended/);
   await expect.poll(async () => page.locator("#build ol li").first().getAttribute("data-flip")).not.toBe(firstBefore);
 
-  await page.getByRole("button", { name: "Make my Tube" }).click();
+  await page.getByRole("button", { name: /Make my Tube/ }).first().click();
   await expect(page).toHaveURL(/\/tube/);
   const cards = page.locator("[data-card]");
   await expect(cards.first()).toBeVisible();
@@ -73,7 +73,7 @@ test("a new visitor builds, watches, shares and exports a Tube", async ({ page, 
   const [zipDl] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: /Starter project/ }).click()]);
   const entries = readZip(readFileSync((await zipDl.path())!));
   const names = entries.map((e) => e.name);
-  expect(names).toEqual(expect.arrayContaining(["lambda-rockets/build.mjs", "lambda-rockets/README.md", "lambda-rockets/lib/tuberemix.mjs", "lambda-rockets/tuberemix.config.json"]));
+  expect(names).toEqual(expect.arrayContaining(["my-tube/build.mjs", "my-tube/README.md", "my-tube/lib/tuberemix.mjs", "my-tube/tuberemix.config.json"]));
   expect(JSON.parse(entries.find((e) => e.name.endsWith("tuberemix.config.json"))!.data.toString("utf8")).name).toBe("Lambda & Rockets");
 
   // Playlist.

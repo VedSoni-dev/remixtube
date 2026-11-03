@@ -33,7 +33,8 @@ export interface VideoLite {
   cr: number; // critical + joke mentions
   y0: number; // first year mentioned on HN
   y1: number; // last year mentioned on HN
-  q?: string; // best pull quote (verbatim excerpt of an HN comment)
+  q?: string; // best pull quote, checked to occur verbatim in the HN comment `qi`
+  qi?: number; // HN comment id the pull quote comes from
 }
 
 export interface Topic {
@@ -42,7 +43,7 @@ export interface Topic {
   name: string;
   area: string;
   description: string;
-  count: number; // eligible videos in this topic
+  count: number; // eligible videos in this topic, not counting news-of-the-day ones (hidden by default)
   chip: boolean; // big enough to make a useful feed on its own
 }
 
@@ -50,7 +51,7 @@ export interface Area {
   id: string;
   name: string;
   topics: string[];
-  count: number;
+  count: number; // as Topic.count
 }
 
 export interface DataIndex {

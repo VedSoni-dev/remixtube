@@ -12,40 +12,106 @@ test("a fresh visitor to /tube gets the topic picker, not an empty page", async 
   await page.goto("/tube");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Start with a few");
   await page.getByRole("button", { name: /^Compilers/ }).first().click();
-  await page.getByRole("button", { name: "Make my Tube" }).click();
+  await page.getByRole("button", { name: /Make my Tube/ }).click();
   await expect(page.locator("[data-card]").first()).toBeVisible();
 });
 
 test("odd combinations still produce a feed", async ({ page }) => {
   await page.goto("/tube");
   for (const n of [/^Ships/, /^Chess/, /^Climate/]) await page.getByRole("button", { name: n }).first().click();
-  await page.getByRole("button", { name: "Make my Tube" }).click();
+  await page.getByRole("button", { name: /Make my Tube/ }).click();
   await expect(page.locator("[data-card]").first()).toBeVisible();
   expect(await page.locator("[data-card]").count()).toBeGreaterThanOrEqual(8);
 });
 
-test("slow network shows skeletons, then real videos", async ({ page }) => {
-  await page.route("**/data/**", async (route) => { await new Promise((r) => setTimeout(r, 1500)); await route.continue(); });
+test("slow network: real videos arrive with the HTML, re-ranking waits gracefully", async ({ page }) => {
+  await page.route("**/data/**", async (route) => { await new Promise((r) => setTimeout(r, 2000)); await route.continue(); });
   await page.goto("/");
+  await expect(page.locator("#build [data-card]").first()).toBeVisible({ timeout: 3000 }); // server-rendered
+  await page.locator("#build").getByRole("button", { name: /^Functional programming/ }).click();
   await expect(page.locator("#build .skeleton").first()).toBeVisible();
-  await expect(page.locator("#build [data-card]").first()).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator("#build")).toContainText(/The top 12 of \d+ videos HN recommended/, { timeout: 20_000 });
+  await expect(page.locator("#build [data-card]").first()).toBeVisible();
 });
 
-test("a missing thumbnail falls back to a typographic card", async ({ page }) => {
+test("a fresh /tube on a slow network shows skeletons, then videos", async ({ page }) => {
+  await page.route("**/data/**", async (route) => { await new Promise((r) => setTimeout(r, 1500)); await route.continue(); });
+  await page.goto("/tube");
+  await expect(page.locator(".skeleton").first()).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Compilers/ }).first()).toBeVisible({ timeout: 20_000 });
+});
+
+test("a missing thumbnail falls back to a typographic card and never hides the video", async ({ page }) => {
   await page.route("https://i.ytimg.com/**", (route) => route.fulfill({ status: 404, body: "" }));
   await page.goto("/");
   await expect(page.locator("#build").getByText("No thumbnail").first()).toBeVisible();
+  await page.goto("/tube");
+  await page.getByRole("button", { name: /^Compilers/ }).first().click();
+  await page.getByRole("button", { name: /Make my Tube/ }).click();
+  await expect(page.locator("[data-card]").first()).toBeVisible();
+  await page.waitForTimeout(500);
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem("tuberemix:v1") ?? "{}"));
+  expect(Object.keys(stored.unavailable ?? {})).toHaveLength(0);
+});
+
+test("the share dialog is fully on screen and the link copies", async ({ page, context }, info) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/tube");
+  await page.getByRole("button", { name: /^Compilers/ }).first().click();
+  await page.getByRole("button", { name: /Make my Tube/ }).click();
+  await expect(page.locator("[data-card]").first()).toBeVisible();
+  await page.getByRole("button", { name: /Share & export/ }).click();
+  const dialog = page.getByRole("dialog");
+  const box = (await dialog.boundingBox())!;
+  const vp = page.viewportSize()!;
+  expect(box.y, info.project.name).toBeGreaterThanOrEqual(0);
+  expect(box.y + Math.min(box.height, vp.height)).toBeLessThanOrEqual(vp.height + 8); // 4px fade-in offset
+  await dialog.getByRole("button", { name: "Copy", exact: true }).click(); // no force: must be clickable
+  await expect(dialog.getByRole("button", { name: "Copied" })).toBeVisible();
+  // Focus stays inside the dialog.
+  for (let i = 0; i < 25; i++) await page.keyboard.press("Tab");
+  expect(await page.evaluate(() => !!document.activeElement?.closest('[role="dialog"]'))).toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+});
+
+test("reset everything really resets", async ({ page }) => {
+  await page.goto("/tube");
+  await page.getByRole("button", { name: /^Compilers/ }).first().click();
+  await page.getByRole("button", { name: /Make my Tube/ }).click();
+  await expect(page.locator("[data-card]").first()).toBeVisible();
+  await page.goto("/tube/customize");
+  page.once("dialog", (d) => d.accept());
+  await page.getByRole("button", { name: "Reset everything" }).click();
+  await expect(page).toHaveURL(/\/tube$/);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Start with a few");
+});
+
+test("on mobile, every section is reachable from More", async ({ page }, info) => {
+  test.skip(info.project.name !== "mobile", "mobile navigation");
+  await page.goto("/tube");
+  await page.getByRole("button", { name: "More" }).click();
+  for (const name of ["Topics", "Liked", "History", "Customize"]) {
+    await expect(page.getByRole("dialog").getByRole("link", { name: new RegExp(`^${name}`) })).toBeVisible();
+  }
+  await page.getByRole("dialog").getByRole("link", { name: /^Topics/ }).click();
+  await expect(page).toHaveURL(/\/tube\/topics/);
+});
+
+test("malformed URLs get a 400, not a 500", async ({ request }) => {
+  expect((await request.get("/r/%E0%A4%A--x")).status()).toBe(400);
+  expect((await request.get("/tube/topics/%C0%AF")).status()).toBe(400);
 });
 
 test("a removed video is explained and dropped from the feed", async ({ page }) => {
-  // Stand in for YouTube's IFrame API reporting error 100 (video not found / private).
-  await page.route("https://www.youtube.com/iframe_api", (route) => route.fulfill({
-    contentType: "text/javascript",
-    body: "window.YT={Player:function(el,o){setTimeout(function(){o.events.onError({data:100})},50);this.destroy=function(){}}};window.onYouTubeIframeAPIReady&&window.onYouTubeIframeAPIReady();",
+  // Stand in for the official embed reporting error 100 (video not found / private) via postMessage.
+  await page.route("https://www.youtube-nocookie.com/embed/**", (route) => route.fulfill({
+    contentType: "text/html",
+    body: "<script>addEventListener('message',function(){parent.postMessage(JSON.stringify({event:'onError',info:100}),'*')});</script>",
   }));
   await page.goto("/tube");
   await page.getByRole("button", { name: /^Compilers/ }).first().click();
-  await page.getByRole("button", { name: "Make my Tube" }).click();
+  await page.getByRole("button", { name: /Make my Tube/ }).click();
   const first = page.locator("[data-card]").first();
   const id = await first.getAttribute("data-card");
   await first.locator("button").first().click();
@@ -61,7 +127,7 @@ test("keyboard: ? opens shortcuts, j moves focus, Enter plays", async ({ page },
   test.skip(info.project.name !== "desktop", "keyboard test on desktop");
   await page.goto("/tube");
   await page.getByRole("button", { name: /^Compilers/ }).first().click();
-  await page.getByRole("button", { name: "Make my Tube" }).click();
+  await page.getByRole("button", { name: /Make my Tube/ }).click();
   await expect(page.locator("[data-card]").first()).toBeVisible();
   await page.keyboard.press("?");
   await expect(page.getByRole("dialog", { name: "Keyboard shortcuts" })).toBeVisible();

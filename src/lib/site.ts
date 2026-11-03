@@ -12,9 +12,12 @@ export const SITE = {
   license: "https://opendatacommons.org/licenses/by/1-0/",
 };
 
+/** Public origin for canonical links and share cards: NEXT_PUBLIC_SITE_URL, else Vercel's production URL, else local. */
 export function siteUrl(): string {
   const env = process.env.NEXT_PUBLIC_SITE_URL;
   if (env && /^https?:\/\//.test(env)) return env.replace(/\/$/, "");
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercel && /^[a-z0-9.-]+$/i.test(vercel)) return `https://${vercel}`;
   return "http://127.0.0.1:3000";
 }
 

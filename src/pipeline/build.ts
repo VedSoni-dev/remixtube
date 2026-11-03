@@ -29,7 +29,7 @@ export interface BuildReport {
   exported: string;
   zip_sha256: string;
   input: { videos: number; mentions: number; related: number; topics: number };
-  dropped: { duplicate_ids: number; no_recommenders: number; net_negative: number; duplicate_titles: number; unknown_categories: number; orphan_mentions: number };
+  dropped: { duplicate_ids: number; no_recommenders: number; net_negative: number; duplicate_titles: number; no_categories: number; unknown_categories: number; orphan_mentions: number; unverified_quotes: number };
   output: { videos: number; mentions: number; topics: number; chips: number; files: number; bytes: number };
   duplicate_title_examples: { kept: string; dropped: string; title: string }[];
 }
@@ -52,6 +52,10 @@ function clip(s: string, n: number): { text: string; cut: boolean } {
   return { text: `${clean.slice(0, cutAt > n * 0.6 ? cutAt : n).trimEnd()}…`, cut: true };
 }
 
+function squash(s: string): string {
+  return s.replace(/\s+/g, " ").trim().toLowerCase();
+}
+
 function stableJson(value: unknown): string {
   return JSON.stringify(value);
 }
@@ -66,7 +70,7 @@ export function buildCatalog(bundle: SourceBundle, adapter: SourceAdapter, zipSh
     exported: bundle.exported,
     zip_sha256: zipSha256,
     input: { videos: bundle.videos.length, mentions: bundle.mentions.length, related: bundle.related.length, topics: 0 },
-    dropped: { duplicate_ids: 0, no_recommenders: 0, net_negative: 0, duplicate_titles: 0, unknown_categories: 0, orphan_mentions: 0 },
+    dropped: { duplicate_ids: 0, no_recommenders: 0, net_negative: 0, duplicate_titles: 0, no_categories: 0, unknown_categories: 0, orphan_mentions: 0, unverified_quotes: 0 },
     output: { videos: 0, mentions: 0, topics: 0, chips: 0, files: 0, bytes: 0 },
     duplicate_title_examples: [],
   };
@@ -119,14 +123,23 @@ export function buildCatalog(bundle: SourceBundle, adapter: SourceAdapter, zipSh
       if (!meta || meta.area !== c.area) { report.dropped.unknown_categories++; continue; }
       if (!k.includes(c.id)) k.push(c.id);
     }
-    if (!k.length) continue;
-    const q = v.quote?.text ? clip(v.quote.text, FILTERS.quoteChars).text : undefined;
+    if (!k.length) { report.dropped.no_categories++; continue; }
+    // Keep the pull quote only if it really occurs in the comment it cites.
+    let q: string | undefined;
+    let qi: number | undefined;
+    if (v.quote?.text) {
+      const src = (mentionsByVid.get(v.vid) ?? []).find((m) => m.hn_comment_id === v.quote!.hn_comment_id);
+      if (src && squash(src.text).includes(squash(v.quote.text))) {
+        q = clip(v.quote.text, FILTERS.quoteChars).text;
+        qi = src.hn_comment_id;
+      } else report.dropped.unverified_quotes++;
+    }
     const lite: VideoLite = {
       id: v.vid, t: v.title.trim(), c: v.channel.trim(), k,
       ty: v.content_type, lv: v.level, sl: v.shelf_life,
       s: v.score, r: v.hn.recommenders, m: v.hn.mentions, rc, sr: v.hn.strong_recs, cr,
       y0: v.hn.first_year, y1: v.hn.last_year,
-      ...(q ? { q } : {}),
+      ...(q ? { q, qi } : {}),
     };
     candidates.push({ v, lite });
   }
@@ -164,13 +177,13 @@ export function buildCatalog(bundle: SourceBundle, adapter: SourceAdapter, zipSh
     const usable = list.filter((v) => v.sl !== "news").length;
     topics.push({
       id, code: topicCode(id), name: meta.name, area: meta.area, description: meta.description,
-      count: list.length,
+      count: usable,
       chip: usable >= FILTERS.chipMinVideos && !id.endsWith("-other"),
     });
   }
   const areas: Area[] = bundle.taxonomy.areas.map((a) => {
     const ids = new Set<string>();
-    for (const c of a.categories) for (const v of topicVideos.get(c.id) ?? []) ids.add(v.id);
+    for (const c of a.categories) for (const v of topicVideos.get(c.id) ?? []) if (v.sl !== "news") ids.add(v.id);
     return { id: a.id, name: a.name, topics: a.categories.map((c) => c.id), count: ids.size };
   });
 

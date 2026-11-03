@@ -49,17 +49,30 @@ export interface Credential {
 
 interface Pending { state: string; nonce: string; verifier: string; redirectUri: string; clientId: string; createdAt: number }
 
-/** Local-only guard. Returns the loopback origin, or null when this server isn't a local install. */
+const LOOPBACK = /^(127\.0\.0\.1|::1|::ffff:127\.0\.0\.1)$/;
+
+/**
+ * Local-only guard. Returns the loopback origin, or null when this server isn't a local install.
+ * Headers alone can be forged, so this also requires that Next itself was started bound to
+ * 127.0.0.1 (`next start -H 127.0.0.1`, as `npm start` does). It fails closed.
+ */
 export function localOrigin(req: Request, opts: { post?: boolean } = {}): string | null {
   if (process.env.TUBEREMIX_LOCAL !== "1") return null;
-  const host = req.headers.get("host") ?? "";
-  if (!/^127\.0\.0\.1:\d{2,5}$/.test(host)) return null;
-  const origin = `http://${host}`;
+  const bound = process.env.__NEXT_PRIVATE_ORIGIN ?? "";
+  if (!/^http:\/\/127\.0\.0\.1:\d{2,5}$/.test(bound)) return null;
+  const h = req.headers;
+  if (`http://${h.get("host") ?? ""}` !== bound) return null;
+  // Anything a reverse proxy adds means this request didn't come straight from this machine.
+  if (h.get("forwarded") || h.get("via") || h.get("x-real-ip")) return null;
+  const xff = (h.get("x-forwarded-for") ?? "127.0.0.1").split(",").map((x) => x.trim());
+  if (!xff.every((x) => LOOPBACK.test(x))) return null;
   if (opts.post) {
     // CSRF: state-changing calls must come from this same local origin.
-    if (req.headers.get("origin") !== origin) return null;
+    if (h.get("origin") !== bound) return null;
+    const site = h.get("sec-fetch-site");
+    if (site && site !== "same-origin") return null;
   }
-  return origin;
+  return bound;
 }
 
 export async function hostId(): Promise<string> {
@@ -137,9 +150,10 @@ export type CallbackResult = { ok: true; planUsage: boolean } | { ok: false; err
 
 export async function handleCallback(params: URLSearchParams): Promise<CallbackResult> {
   const pending = await readJsonFile<Pending>("pending.json");
-  await rm(file("pending.json"), { force: true });
   if (!pending || Date.now() - pending.createdAt > 10 * 60_000) return { ok: false, error: "Sign-in expired. Start again." };
+  // A stray request with the wrong state must not cancel a sign-in in progress.
   if (params.get("state") !== pending.state) return { ok: false, error: "State mismatch; sign-in ignored." };
+  await rm(file("pending.json"), { force: true });
   if (params.get("error")) return { ok: false, error: params.get("error") === "access_denied" ? "You declined, so TubeRemix won’t use your ChatGPT plan." : `Sign-in failed: ${params.get("error")}` };
   const code = params.get("code");
   if (!code) return { ok: false, error: "No authorization code returned." };
@@ -177,20 +191,27 @@ export async function handleCallback(params: URLSearchParams): Promise<CallbackR
 
 let refreshing: Promise<Credential> | null = null;
 async function freshCredential(): Promise<Credential> {
-  const c = await loadCredential();
-  if (!c) throw Object.assign(new Error("Not signed in with ChatGPT."), { status: 401 });
-  const expiresAt = Date.parse(c.saved_at) + c.expires_in * 1000;
-  if (expiresAt - Date.now() > 120_000) return c;
+  const first = await loadCredential();
+  if (!first?.refresh_token) throw Object.assign(new Error("Not signed in with ChatGPT."), { status: 401 });
+  if (Date.parse(first.saved_at) + first.expires_in * 1000 - Date.now() > 120_000) return first;
+  // Single flight; re-read inside it so a rotated refresh token is never reused.
   refreshing ??= (async () => {
     try {
+      const c = (await loadCredential())!;
+      if (Date.parse(c.saved_at) + c.expires_in * 1000 - Date.now() > 120_000) return c;
       const res = await fetch(TOKEN, {
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ grant_type: "refresh_token", client_id: c.client_id, refresh_token: c.refresh_token, resource: RESOURCE }),
       });
-      if (!res.ok) throw Object.assign(new Error("Your ChatGPT session ended. Sign in again."), { status: 401 });
-      const t = (await res.json()) as { access_token: string; refresh_token: string; expires_in: number; scope?: string };
-      const next: Credential = { ...c, access_token: t.access_token, refresh_token: t.refresh_token, expires_in: t.expires_in, scopes: t.scope ? t.scope.split(/\s+/).sort() : c.scopes, saved_at: new Date().toISOString() };
+      if (res.status >= 500) throw Object.assign(new Error("ChatGPT sign-in is temporarily unavailable. Try again shortly."), { status: 503 });
+      if (!res.ok) {
+        // invalid_grant and friends are terminal: forget the tokens so the UI shows signed out.
+        await writeJsonFile("chatgpt.json", { ...c, access_token: "", refresh_token: "", expires_in: 0 });
+        throw Object.assign(new Error("Your ChatGPT session ended. Sign in again."), { status: 401 });
+      }
+      const t = (await res.json()) as { access_token: string; refresh_token?: string; expires_in: number; scope?: string };
+      const next: Credential = { ...c, access_token: t.access_token, refresh_token: t.refresh_token || c.refresh_token, expires_in: t.expires_in, scopes: t.scope ? t.scope.split(/\s+/).sort() : c.scopes, saved_at: new Date().toISOString() };
       await writeJsonFile("chatgpt.json", next);
       return next;
     } finally {
@@ -226,6 +247,9 @@ export async function completeWithPlan(system: string, user: string): Promise<st
     let code = "";
     try { code = ((await res.json()) as { error?: { code?: string } }).error?.code ?? ""; } catch { /* ignore */ }
     if (code === "subscription_sharing_usage_limit_exceeded") throw Object.assign(new Error(`Usage limit reached. Manage usage: ${MANAGE_USAGE}`), { status: 429 });
+    if (code === "subscription_sharing_usage_unavailable" || code === "subscription_sharing_user_unavailable") {
+      throw Object.assign(new Error("ChatGPT couldn’t check your plan right now. Try again in a minute."), { status: 503 });
+    }
     throw Object.assign(new Error(`ChatGPT request failed (HTTP ${res.status}${code ? `, ${code}` : ""}).`), { status: res.status });
   }
   const reader = res.body.getReader();
@@ -262,17 +286,21 @@ export async function signOut(): Promise<{ revoked: boolean }> {
   const c = await loadCredential();
   if (!c) return { revoked: true };
   let revoked = false;
-  try {
-    const disc = (await (await fetch(DISCOVERY)).json()) as { revocation_endpoint?: string };
-    if (disc.revocation_endpoint) {
+  // Retry network errors and 5xx with backoff while we still hold the refresh token.
+  for (let attempt = 0; attempt < 3 && !revoked && c.refresh_token; attempt++) {
+    try {
+      const disc = (await (await fetch(DISCOVERY)).json()) as { revocation_endpoint?: string };
+      if (!disc.revocation_endpoint) break;
       const r = await fetch(disc.revocation_endpoint, {
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ token: c.refresh_token, token_type_hint: "refresh_token", client_id: c.client_id }),
       });
       revoked = r.ok;
-    }
-  } catch { /* network: report not confirmed */ }
+      if (r.status < 500) break;
+    } catch { /* network: retry */ }
+    if (!revoked) await new Promise((r) => setTimeout(r, 500 * 2 ** attempt));
+  }
   // Keep the client/account mapping and host id for a later sign-in; clear the tokens.
   await writeJsonFile("chatgpt.json", { ...c, access_token: "", refresh_token: "", id_token: "", expires_in: 0 });
   return { revoked };

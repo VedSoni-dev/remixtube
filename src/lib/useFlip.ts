@@ -28,15 +28,16 @@ export function useFlip<T extends HTMLElement>(keys: string[]) {
           const dx = prev.left - now.left;
           const dy = prev.top - now.top;
           if (dx || dy) {
+            item.style.zIndex = "1";
             item.animate(
               [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "translate(0, 0)" }],
-              { duration: 620, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)", delay: Math.min(i * 12, 180) },
-            );
+              { duration: 420, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)", delay: Math.min(i * 10, 120) },
+            ).onfinish = () => { item.style.zIndex = ""; };
           }
         } else if (boxes.current.size) {
           item.animate(
-            [{ opacity: 0, transform: "scale(0.96)" }, { opacity: 1, transform: "scale(1)" }],
-            { duration: 420, easing: "ease-out", delay: 140 + Math.min(i * 16, 220), fill: "backwards" },
+            [{ opacity: 0, transform: "scale(0.97)" }, { opacity: 1, transform: "scale(1)" }],
+            { duration: 260, easing: "ease-out", delay: Math.min(i * 12, 140), fill: "backwards" },
           );
         }
       });

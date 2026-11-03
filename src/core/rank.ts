@@ -1,5 +1,5 @@
 // TubeRemix ranking: deterministic, explainable, no model calls.
-// The same inputs always give the same feed. See docs/RANKING.md.
+// The same inputs always give the same feed. Explained in the README ("How ranking works").
 
 import { hash01 } from "./hash";
 import type { Prefs } from "./prefs";
@@ -175,7 +175,7 @@ function reasonsFor(s: Scored, slot: Ranked["slot"], prefs: Prefs, sig: Signals,
     out.push({ kind: "classic", text: "An all-time HN classic" });
   }
   if (s.v.r > 0) {
-    out.push({ kind: "crowd", text: `Recommended by ${s.v.r} HN commenter${s.v.r === 1 ? "" : "s"} across ${s.v.y0 === s.v.y1 ? s.v.y0 : `${s.v.y0}–${s.v.y1}`}` });
+    out.push({ kind: "crowd", text: `Recommended by ${s.v.r} HN commenter${s.v.r === 1 ? "" : "s"}` });
   }
   if (s.v.sr >= 2) out.push({ kind: "strong", text: `${s.v.sr} enthusiastic recommendations` });
   if (prefs.formats[s.v.ty] === 1) out.push({ kind: "format", text: `You asked for more ${s.v.ty}s` });
