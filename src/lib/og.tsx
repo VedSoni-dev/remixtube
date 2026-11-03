@@ -13,6 +13,8 @@ function loadFonts() {
     readFile(join(fontDir, "InstrumentSerif-Regular.ttf")).then((data) => ({ name: "Serif", data, style: "normal" as const, weight: 400 as const })),
     readFile(join(fontDir, "InstrumentSerif-Italic.ttf")).then((data) => ({ name: "Serif", data, style: "italic" as const, weight: 400 as const })),
     readFile(join(fontDir, "JetBrainsMono-Medium.ttf")).then((data) => ({ name: "Mono", data, style: "normal" as const, weight: 500 as const })),
+    // next/og's bundled sans; passing custom fonts would otherwise drop it.
+    readFile(join(process.cwd(), "node_modules/next/dist/compiled/@vercel/og/Geist-Regular.ttf")).then((data) => ({ name: "Geist", data, style: "normal" as const, weight: 400 as const })),
   ]);
   return fonts;
 }

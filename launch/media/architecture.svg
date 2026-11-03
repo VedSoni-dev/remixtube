@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" width="1200" height="560" font-family="Georgia, serif">
+  <rect width="1200" height="560" fill="#f4f1ea"/>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#15130f"/></marker>
+  </defs>
+  <style>
+    .k{font:500 12px ui-monospace,Menlo,monospace;letter-spacing:.08em;fill:#6d695f;text-transform:uppercase}
+    .t{font:400 26px Georgia,serif;fill:#15130f}
+    .s{font:15px ui-sans-serif,system-ui,sans-serif;fill:#3b3830}
+    .box{fill:#fbfaf6;stroke:#15130f;stroke-width:1.5}
+    .hl{fill:#f1e05a}
+    .ln{stroke:#15130f;stroke-width:1.5;fill:none;marker-end:url(#a)}
+  </style>
+  <text x="48" y="58" class="k">TubeRemix · how the data flows</text>
+
+  <rect x="48" y="96" width="250" height="170" rx="4" class="box"/>
+  <text x="68" y="128" class="k">Upstream</text>
+  <text x="68" y="164" class="t" style="font-size:22px">hackertube-data.zip</text>
+  <text x="68" y="194" class="s">6,454 videos · 39,834 comments</text>
+  <text x="68" y="216" class="s">150 topics · embeddings · graph</text>
+  <text x="68" y="246" class="s">ODC-By 1.0 · sha256 pinned</text>
+
+  <path d="M298 181 H370" class="ln"/>
+
+  <rect x="370" y="96" width="300" height="170" rx="4" class="box"/>
+  <rect x="390" y="148" width="130" height="22" class="hl"/>
+  <text x="390" y="128" class="k">npm run data:import</text>
+  <text x="390" y="164" class="t">Pipeline</text>
+  <text x="390" y="194" class="s">strict schemas · dedupe · filters</text>
+  <text x="390" y="216" class="s">provenance · nearest neighbours</text>
+  <text x="390" y="246" class="s">deterministic, manifest diff</text>
+
+  <path d="M670 181 H742" class="ln"/>
+
+  <rect x="742" y="96" width="410" height="170" rx="4" class="box"/>
+  <text x="762" y="128" class="k">public/data · static, cached</text>
+  <text x="762" y="164" class="t">Small shards</text>
+  <text x="762" y="194" class="s">index (17 KB) · one shard per topic</text>
+  <text x="762" y="216" class="s">staples · provenance in 1,024 buckets</text>
+  <text x="762" y="246" class="s">never the whole dataset to a page</text>
+
+  <path d="M947 266 V320 H600 V352" class="ln"/>
+  <path d="M947 266 V320 H1010 V352" class="ln"/>
+  <path d="M947 266 V320 H190 V352" class="ln"/>
+
+  <rect x="48" y="352" width="300" height="160" rx="4" class="box"/>
+  <text x="68" y="384" class="k">Your browser</text>
+  <text x="68" y="420" class="t">rank.ts</text>
+  <text x="68" y="450" class="s">deterministic, no AI needed</text>
+  <text x="68" y="472" class="s">likes · history in localStorage</text>
+  <text x="68" y="494" class="s">official YouTube embed on click</text>
+
+  <rect x="418" y="352" width="364" height="160" rx="4" class="box"/>
+  <rect x="438" y="404" width="236" height="22" class="hl"/>
+  <text x="438" y="384" class="k">Server · same rank.ts</text>
+  <text x="438" y="420" class="t">/r/name--token</text>
+  <text x="438" y="450" class="s">the link is the config: no database</text>
+  <text x="438" y="472" class="s">server-rendered feed + share card</text>
+  <text x="438" y="494" class="s">Remix this Tube → your copy</text>
+
+  <rect x="852" y="352" width="300" height="160" rx="4" class="box"/>
+  <text x="872" y="384" class="k">Take it with you</text>
+  <text x="872" y="420" class="t">Export</text>
+  <text x="872" y="450" class="s">config · playlist · YouTube queue</text>
+  <text x="872" y="472" class="s">starter: node build.mjs</text>
+  <text x="872" y="494" class="s">Claude Code prompt</text>
+</svg>

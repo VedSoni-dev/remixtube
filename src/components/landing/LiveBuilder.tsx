@@ -84,7 +84,7 @@ function Builder() {
         <div className="mt-5" role="group" aria-label="Interests">
           {!index && <div className="flex flex-wrap gap-2" aria-busy="true">{Array.from({ length: 12 }, (_, i) => <span key={i} className="skeleton h-9 w-28 rounded-full" />)}</div>}
           {index && shown && (
-            <div className="flex flex-wrap gap-2">
+            <div className="no-scrollbar -mx-4 grid auto-cols-max grid-flow-col grid-rows-2 gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex sm:flex-wrap sm:overflow-visible sm:px-0">
               {[...shown, ...index.topics.filter((t) => picked.includes(t.id) && !shown.some((s) => s.id === t.id))].map((t) => (
                 <Chip key={t.id} topic={t} on={picked.includes(t.id)} onClick={() => toggle(t.id)} />
               ))}
@@ -161,7 +161,7 @@ function Chip({ topic, on, onClick }: { topic: Topic; on: boolean; onClick: () =
       type="button"
       onClick={onClick}
       aria-pressed={on}
-      className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[13.5px] font-medium transition-colors ${on ? "border-ink bg-ink text-paper" : "border-hair bg-card text-ink hover:border-ink/40"}`}
+      className={`inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 text-[13.5px] font-medium transition-colors sm:h-9 ${on ? "border-ink bg-ink text-paper" : "border-hair bg-card text-ink hover:border-ink/40"}`}
     >
       {on ? <Check size={14} aria-hidden /> : <Plus size={14} aria-hidden className="text-muted" />}
       {topic.name}

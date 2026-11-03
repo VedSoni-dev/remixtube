@@ -16,7 +16,7 @@ const csp = [
 ].join("; ");
 
 const dataFiles = ["./public/data/index.json", "./public/data/staples.json", "./public/data/t/**/*"];
-const cardFiles = [...dataFiles, "./src/assets/fonts/*.ttf"];
+const cardFiles = [...dataFiles, "./src/assets/fonts/*.ttf", "./node_modules/next/dist/compiled/@vercel/og/Geist-Regular.ttf"];
 
 const config: NextConfig = {
   poweredByHeader: false,

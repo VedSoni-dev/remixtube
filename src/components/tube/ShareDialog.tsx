@@ -1,6 +1,7 @@
 "use client";
 import { Check, Copy, Download, ExternalLink, FileJson, FileText, Package, Share2, Sheet, Terminal, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { claudeCodePrompt, playlistCsv, playlistJson, playlistMarkdown, toConfig, youtubeQueueUrl } from "@/core/exporters";
 import { cleanName } from "@/core/prefs";
 import { sharePath } from "@/core/share";
@@ -33,7 +34,8 @@ export function ShareButton() {
       >
         <Share2 size={15} aria-hidden /> Share &amp; export
       </button>
-      {open && <ShareDialog onClose={() => setOpen(false)} />}
+      {/* Portal: the sticky header's backdrop-filter would otherwise trap position: fixed. */}
+      {open && createPortal(<ShareDialog onClose={() => setOpen(false)} />, document.body)}
     </>
   );
 }
