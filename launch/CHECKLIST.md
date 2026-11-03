@@ -3,12 +3,11 @@
 Everything below is outward-facing, so none of it has been done. Each step says exactly what to run
 or click.
 
-## 1. Make the repo public (needed for Source links, the self-host guide and publik)
+## 1. Public repo ✅ (done 2026-11-03) and a first release
 
-The code is pushed to `VedSoni-dev/remixtube` (private). When you're ready:
+`VedSoni-dev/remixtube` is public. Still to do: a release (publik lists from the latest release):
 
 ```bash
-gh repo edit VedSoni-dev/remixtube --visibility public --accept-visibility-change-consequences
 gh release create v0.1.0 --repo VedSoni-dev/remixtube --title "TubeRemix 0.1.0" --notes "First public release."
 ```
 

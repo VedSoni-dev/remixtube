@@ -19,13 +19,9 @@ publik yet.** No account, token, listing or call exists.
 
 ## Blockers before publish.md step 1 can even start
 
-1. `git remote get-url origin` is `VedSoni-dev/remixtube`, which is **private and has no commits
-   pushed**. publik lists apps from a GitHub repository and its latest release. Two options:
-   - make the repo **public** (recommended: TubeRemix is MIT open source, and the self-host guide
-     already points to it), then create a GitHub release (e.g. `v0.1.0`); or
-   - keep it private and connect it via `https://publikhq.com/api/github/app/connect?repo=VedSoni-dev/remixtube&next=/submit`;
-     publik then lists it closed-source and expects a release download for each platform, which a
-     web app doesn't have.
+1. ✅ `VedSoni-dev/remixtube` is public (2026-11-03). Still missing: a GitHub release (e.g.
+   `v0.1.0`), since publik reads the latest release; publish.md says a public repo without one can
+   still install from source, and asks whether to continue.
 2. You need `https://publikhq.com/submit` open, signed in with GitHub, to approve the device-flow
    code in the browser (one approval, lasts an hour).
 
@@ -49,7 +45,7 @@ publik yet.** No account, token, listing or call exists.
 
 ## What I need from you
 
-- **Yes/no:** make `VedSoni-dev/remixtube` public and push `main` (+ tag `v0.1.0` release).
+- **Yes/no:** create the `v0.1.0` GitHub release (the repo is already public).
 - **Yes/no:** publish a public publik listing with publik API (`ai.chat`) enabled.
 - One browser approval on publik when the device code appears.
 
