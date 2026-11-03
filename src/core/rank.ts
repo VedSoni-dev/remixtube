@@ -217,10 +217,11 @@ export function rankFeed(candidates: readonly VideoLite[], prefs: Prefs, sig: Si
   const recentChannels: string[] = [];
   let outIdx = 0;
 
-  while (picked.length < opts.limit && (main.length || outIdx < outside.length)) {
+  // The feed ends when your topics run out; outside picks only fill serendipity slots.
+  while (picked.length < opts.limit && main.length) {
     const slotNo = picked.length + 1;
     const wantOutside = hasTopics && every > 0 && slotNo % every === 0 && outIdx < outside.length;
-    if (wantOutside || (!main.length && outIdx < outside.length)) {
+    if (wantOutside) {
       const s = outside[outIdx++]!;
       picked.push({ video: s.v, score: s.base, reasons: reasonsFor(s, "serendipity", prefs, sig, ctx), slot: "serendipity" });
       recentTopics.push(s.v.k[0] ?? "");

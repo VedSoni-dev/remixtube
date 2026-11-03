@@ -18,7 +18,7 @@
     "start": "next start -H 127.0.0.1 -p 3000",
     "start:public": "next start -p ${PORT:-3000}",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "npm run starter:build && vitest run",
     "test:e2e": "playwright test",
     "analytics:report": "tsx scripts/analytics-report.ts"
   },
