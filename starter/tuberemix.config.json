@@ -1,0 +1,23 @@
+{
+  "tuberemix": 1,
+  "name": "Systems & Space",
+  "topics": {
+    "distributed-systems": 3,
+    "databases-storage": 2,
+    "space-exploration": 2
+  },
+  "formats": { "talk": 1 },
+  "depth": "any",
+  "serendipity": 1,
+  "news": false,
+  "seed": 1,
+  "remix_of": null,
+  "share_url": "",
+  "source": {
+    "id": "hackertube",
+    "data_url": "https://hackertube.org/download/hackertube-data.zip",
+    "zip_sha256": "c61bd220d1f3899152f63e6b159eece612f4da49727cc9e970bebba70279892e",
+    "exported": "2026-10-31",
+    "license": "ODC-By-1.0"
+  }
+}

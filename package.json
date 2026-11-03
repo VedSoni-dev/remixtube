@@ -1,0 +1,45 @@
+{
+  "name": "tuberemix",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Make your own HackerTube: a personal, community-curated video feed built from the open HackerTube dataset.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "data:import": "tsx scripts/import.ts",
+    "data:check": "tsx scripts/import.ts --check",
+    "starter:build": "tsx scripts/build-starter.ts",
+    "prepare:data": "npm run data:import && npm run starter:build",
+    "dev": "next dev -H 127.0.0.1 -p 3000",
+    "build": "npm run prepare:data && next build",
+    "start": "next start -H 127.0.0.1 -p 3000",
+    "start:public": "next start -p ${PORT:-3000}",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "analytics:report": "tsx scripts/analytics-report.ts"
+  },
+  "dependencies": {
+    "lucide-react": "0.555.0",
+    "next": "16.4.5",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "server-only": "^0.0.1",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@tailwindcss/postcss": "4.3.4",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "esbuild": "0.28.2",
+    "tailwindcss": "4.3.4",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.1.0"
+  }
+}

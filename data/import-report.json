@@ -1,0 +1,104 @@
+{
+  "source": "hackertube",
+  "exported": "2026-10-31",
+  "zip_sha256": "c61bd220d1f3899152f63e6b159eece612f4da49727cc9e970bebba70279892e",
+  "input": {
+    "videos": 6454,
+    "mentions": 39834,
+    "related": 3778,
+    "topics": 150
+  },
+  "dropped": {
+    "duplicate_ids": 0,
+    "no_recommenders": 1658,
+    "net_negative": 156,
+    "duplicate_titles": 14,
+    "unknown_categories": 0,
+    "orphan_mentions": 0
+  },
+  "output": {
+    "videos": 4626,
+    "mentions": 24471,
+    "topics": 150,
+    "chips": 133,
+    "files": 1193,
+    "bytes": 31588931
+  },
+  "duplicate_title_examples": [
+    {
+      "kept": "SxdOUGdseq4",
+      "dropped": "LKtk3HCgTa8",
+      "title": "\"Simple Made Easy\" - Rich Hickey (2011)"
+    },
+    {
+      "kept": "8Z685OF-PS8",
+      "dropped": "oCZMoY3q2uM",
+      "title": "A New Way to look at Networking"
+    },
+    {
+      "kept": "8Z685OF-PS8",
+      "dropped": "gqGEMQveoqg",
+      "title": "A New Way to look at Networking"
+    },
+    {
+      "kept": "PUv66718DII",
+      "dropped": "EGqwXt90ZqA",
+      "title": "Bret Victor - Inventing on Principle"
+    },
+    {
+      "kept": "PUv66718DII",
+      "dropped": "8QiPFmIMxFc",
+      "title": "Bret Victor Inventing on Principle"
+    },
+    {
+      "kept": "xrIjfIjssLE",
+      "dropped": "uKfKtXYLG78",
+      "title": "Erlang: The Movie"
+    },
+    {
+      "kept": "YEBfamv-_do",
+      "dropped": "3QnD2c4Xovk",
+      "title": "Diffie-Hellman Key Exchange"
+    },
+    {
+      "kept": "TgmA48fILq8",
+      "dropped": "6chLw2aodYQ",
+      "title": "Dtrace Review"
+    },
+    {
+      "kept": "9CO6M2HsoIA",
+      "dropped": "HipTO_7mUOw",
+      "title": "Slaughterbots"
+    },
+    {
+      "kept": "pqzcCfUglws",
+      "dropped": "Jv7sLrON7QY",
+      "title": "The Psychology of Human Misjudgement - Charlie Munger Full Speech"
+    },
+    {
+      "kept": "p6K4iIMlouI",
+      "dropped": "eX9m3g5J-XA",
+      "title": "7 Habits For Effective Text Editing 2.0"
+    },
+    {
+      "kept": "h67k9eEw9AY",
+      "dropped": "o25I2fzFGoY",
+      "title": "George Carlin on soft language"
+    },
+    {
+      "kept": "X3NASGb5m8s",
+      "dropped": "NlBjNmXvqIM",
+      "title": "Steve jobs on why xerox failed"
+    },
+    {
+      "kept": "BsVydyC8ZGQ",
+      "dropped": "cjriSNgFHsM",
+      "title": "BeOS Demo Video"
+    }
+  ],
+  "diff": {
+    "added": 0,
+    "removed": 0,
+    "changed": 4626
+  }
+}
