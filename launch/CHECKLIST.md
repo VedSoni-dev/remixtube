@@ -39,11 +39,10 @@ cd launch/media
 ffmpeg -y -ss 0.3 -i .rec/a.webm -ss 0.5 -i .rec/b.webm -filter_complex "[0:v]setpts=(PTS-STARTPTS)/1.2,fps=30,scale=1280:720:flags=lanczos,format=yuv420p[a];[1:v]setpts=PTS-STARTPTS,fps=30,scale=1280:720:flags=lanczos,format=yuv420p[b];[a][b]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -preset slow -crf 20 -movflags +faststart demo-full.mp4
 ```
 
-## 4. publik (see `launch/PUBLIK_PLAN.md`)
+## 4. publik: off for now
 
-After step 1, tell Claude "go ahead with publik". It will derive the listing, show you the
-checklist, and ask you to approve one device code in your browser at publikhq.com before anything
-is published.
+Skipped by owner decision (2026-11-03). Nothing was listed. `launch/PUBLIK_PLAN.md` keeps the plan
+if you want it later.
 
 ## 5. Post on X
 

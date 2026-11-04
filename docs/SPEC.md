@@ -66,7 +66,7 @@ Server:  /r/<slug>--<token> renders the same ranking (SSR) + OG card (next/og, r
 - [x] Public GitHub repo: https://github.com/VedSoni-dev/remixtube (owner OK, 2026-11-03)
 - [x] v0.1.0 release: https://github.com/VedSoni-dev/remixtube/releases/tag/v0.1.0
 - [ ] Public deploy (needs owner OK + Vercel account)
-- [ ] Publik listing (needs public repo + owner approval in browser)
+- [ ] ~~Publik listing~~: off for now (owner, 2026-11-03)
 - [ ] Post on X (owner)
 
 ## Limitations (honest)

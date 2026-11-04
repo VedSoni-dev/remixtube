@@ -48,6 +48,5 @@ Share & export and run it in Claude Code yourself.
 
 ## publik
 
-publik (publikhq.com) offers keyless, OpenAI-compatible AI for an app's users once the app is
-listed. Listing requires a public GitHub repository (or a connected private one with platform
-release downloads). Not wired yet; see `launch/PUBLIK_PLAN.md`.
+Off for now (owner decision, 2026-11-03). TubeRemix isn't listed on publik and has no publik
+code. The earlier plan is kept in `launch/PUBLIK_PLAN.md` in case it comes back.

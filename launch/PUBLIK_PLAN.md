@@ -1,4 +1,9 @@
-# publik setup plan (setup.md step 2 checklist, waiting for a yes)
+# publik setup plan (off for now)
+
+> **Status, 2026-11-03: off by owner decision.** Nothing was published. Two device codes were
+> requested for the sign-in step; both expired without approval. No publik account link, app
+> token, install key or listing exists, and the app ships with no publik code. The plan below is
+> kept as it was, in case publik comes back.
 
 Source of the procedure: `https://publikhq.com/skills/setup.md`, `publish.md`, `api.md`, fetched
 raw with curl on 2026-11-03 and read in full before anything was run. **Nothing has been run against
