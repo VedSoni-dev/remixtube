@@ -1,7 +1,7 @@
 # X launch copy
 
-`[LINK]` = the live TubeRemix URL once deployed (X counts any link as 23 characters). `[REPO]` = the
-GitHub repo once public. Nothing here has been posted. Every number is from the shipped data
+Links are filled in: the live site is https://tuberemix.vercel.app, the repo https://github.com/VedSoni-dev/remixtube (X counts any link as 23
+characters, so the counts below hold). Nothing here has been posted. Every number is from the shipped data
 (`public/data/index.json`), the live share card, or Karpathy's own post, checked 2026-11-03. Each post
 fits in 280 characters (count shown).
 
@@ -12,12 +12,12 @@ fits in 280 characters (count shown).
 >
 > This is the "make your own" part: pick a few interests, get a feed of the videos HN commenters recommended, comments attached. No login.
 >
-> [LINK]
+> https://tuberemix.vercel.app
 
 **2. Builder tutorial** (266)
 > Build your own HackerTube in 2 minutes:
 >
-> 1. pick topics at [LINK]
+> 1. pick topics at https://tuberemix.vercel.app
 > 2. Share & export → Starter project
 > 3. node build.mjs
 >
@@ -28,7 +28,7 @@ fits in 280 characters (count shown).
 >
 > Hacker News spent 19 years telling each other which talks and documentaries were worth an hour. TubeRemix turns that into your own feed, with receipts: every video shows the comments that recommended it.
 >
-> [LINK]
+> https://tuberemix.vercel.app
 
 **4. Open-source announcement** (278)
 > TubeRemix is open source (MIT): a remixable front end for the HackerTube dataset.
@@ -39,14 +39,14 @@ fits in 280 characters (count shown).
 > · a zero-dependency starter
 >
 > Data: HackerTube (ODC-By)
-> [REPO]
+> https://github.com/VedSoni-dev/remixtube
 
 **5. Surprising demo, with the video** (274)
 > Tap "Machine learning", "Functional programming", "Fundamental physics".
 >
 > The grid re-sorts itself into your own HackerTube, live, from the 437 videos HN commenters recommended in those topics. Open one and you get their actual comments.
 >
-> Make yours: [LINK]
+> Make yours: https://tuberemix.vercel.app
 
 Attach `launch/media/demo-interests-to-feed.mp4`.
 
@@ -68,12 +68,12 @@ the reply under his post is built from it.
 4. (223)
 > Want your own site? Share & export → Starter project: your config inside, `node build.mjs` rebuilds the feed from the source data with the same ranking code. There's a Claude Code prompt too.
 >
-> Guide: [LINK]/build-your-own
+> Guide: https://tuberemix.vercel.app/build-your-own
 5. (246)
 > Ranking is deterministic, no AI needed: topic match, how many months HN kept recommending it, how many different people did, plus variety and your likes. Formula's in the README.
 >
 > Data: HackerTube (ODC-By). Not affiliated.
-> [REPO]
+> https://github.com/VedSoni-dev/remixtube
 
 ## Reply to Karpathy's post (271)
 
@@ -81,7 +81,7 @@ the reply under his post is built from it.
 >
 > I made a small "make your own" layer: pick topics, get the 4,626 videos at least one commenter genuinely recommended, those comments verbatim, a share link and a zero-dep starter.
 >
-> [LINK]
+> https://tuberemix.vercel.app
 
 Why this one: it thanks him for something he actually did (published the data with a clear DATA.md),
 adds substance (what was built on top, using a detail of his data model: only real recommendations),

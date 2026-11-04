@@ -17,6 +17,11 @@ gh release upload v0.1.0 .cache/hackertube-data.zip --repo VedSoni-dev/remixtube
 
 ## 2. Deploy
 
+Done 2026-11-03: **https://tuberemix.vercel.app** (Vercel project `tuberemix`, deployed from a clean export of `main`;
+the GitHub repo isn't connected, so pushes don't auto-deploy). Checked live: every page, the data
+files, the starter ZIP, share links, share cards, security headers, and landing → three picks →
+Make my Tube → play a video → Share & export. To redeploy:
+
 Vercel (no secrets needed):
 
 ```bash
@@ -48,7 +53,7 @@ if you want it later.
 
 Copy from `launch/POSTS.md`:
 
-1. Main post: #5 with `launch/media/demo-interests-to-feed.mp4`, `[LINK]` → your live URL.
+1. Main post: #5 with `launch/media/demo-interests-to-feed.mp4` (links are filled in).
 2. Thread: posts 2–5 under it.
 3. Reply under https://x.com/karpathy/status/2116957135661945283 with the reply text and the same clip.
 

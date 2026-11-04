@@ -3,6 +3,8 @@
 **Make your own HackerTube.** Karpathy built a better YouTube from community recommendations.
 Now make one for your interests.
 
+**Try it: https://tuberemix.vercel.app**
+
 ![TubeRemix landing page](launch/media/readme-hero.png)
 
 TubeRemix turns the open [HackerTube](https://hackertube.org) dataset (the YouTube videos that
