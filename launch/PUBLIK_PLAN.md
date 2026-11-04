@@ -19,13 +19,12 @@ publik yet.** No account, token, listing or call exists.
 
 ## Blockers before publish.md step 1 can even start
 
-1. ✅ `VedSoni-dev/remixtube` is public (2026-11-03). Still missing: a GitHub release (e.g.
-   `v0.1.0`), since publik reads the latest release; publish.md says a public repo without one can
-   still install from source, and asks whether to continue.
+1. ✅ `VedSoni-dev/remixtube` is public and `v0.1.0` is its latest release (2026-11-03). The release
+   has no attached binaries (it's a web app), so publik will list it as install-from-source.
 2. You need `https://publikhq.com/submit` open, signed in with GitHub, to approve the device-flow
    code in the browser (one approval, lasts an hour).
 
-## The plan, once the repo is public with a release
+## The plan (repo public, release out)
 
 1. `publish.md` step 2: `POST https://publikhq.com/api/submit/derive {"repo":"VedSoni-dev/remixtube"}`
    (no sign-in) and show you the derived manifest: name (≤18 chars, likely "TubeRemix"), summary
@@ -45,7 +44,6 @@ publik yet.** No account, token, listing or call exists.
 
 ## What I need from you
 
-- **Yes/no:** create the `v0.1.0` GitHub release (the repo is already public).
 - **Yes/no:** publish a public publik listing with publik API (`ai.chat`) enabled.
 - One browser approval on publik when the device code appears.
 

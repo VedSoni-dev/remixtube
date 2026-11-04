@@ -3,15 +3,12 @@
 Everything below is outward-facing, so none of it has been done. Each step says exactly what to run
 or click.
 
-## 1. Public repo ✅ (done 2026-11-03) and a first release
+## 1. Public repo ✅ and v0.1.0 release ✅ (both 2026-11-03)
 
-`VedSoni-dev/remixtube` is public. Still to do: a release (publik lists from the latest release):
+`VedSoni-dev/remixtube` is public; https://github.com/VedSoni-dev/remixtube/releases/tag/v0.1.0 is
+the latest release (tag at `13cc863`).
 
-```bash
-gh release create v0.1.0 --repo VedSoni-dev/remixtube --title "TubeRemix 0.1.0" --notes "First public release."
-```
-
-Optional but recommended: attach the pinned dataset as a mirror (ODC-By allows redistribution
+Optional, not done: attach the pinned dataset as a mirror (ODC-By allows redistribution
 with attribution), then add its URL to `mirrors` in `data/source.lock.json`:
 
 ```bash

@@ -64,7 +64,7 @@ Server:  /r/<slug>--<token> renders the same ranking (SSR) + OG card (next/og, r
 - [x] Unit tests (vitest) and e2e acceptance (Playwright, desktop + mobile)
 - [x] Independent reviewer passes (product + growth, first-time user + developer, design + accessibility, data + security); all blockers and majors fixed and retested
 - [x] Public GitHub repo: https://github.com/VedSoni-dev/remixtube (owner OK, 2026-11-03)
-- [ ] v0.1.0 release (needs owner OK)
+- [x] v0.1.0 release: https://github.com/VedSoni-dev/remixtube/releases/tag/v0.1.0
 - [ ] Public deploy (needs owner OK + Vercel account)
 - [ ] Publik listing (needs public repo + owner approval in browser)
 - [ ] Post on X (owner)
